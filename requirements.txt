@@ -1,0 +1,4 @@
+click >= 7.1.2
+openpyxl >= 3.0.10
+pandas >= 1.4.3
+pytest-shutil >= 1.7.0
