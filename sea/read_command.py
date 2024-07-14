@@ -15,18 +15,24 @@ class Code:
 
         "Allows the user to read a spreadsheet through a terminal window."
 
-        filename_with_extension = filepath.split("/")[-1]
+        # Check if filepath contains ~ and replace with expanded home directory
+        if "~" in filepath:
+            filepath = os.path.expanduser(filepath)
 
-        if "/" in filepath and "~" in filepath:
+        if not os.path.isabs(filepath):
+            # Constructs an absolute file path based on the current working directory
+            filepath = os.path.join(os.getcwd(), filepath)
 
-            filepath = f"{os.getcwd()}{filename_with_extension}"
-
-        if sheetname != None:
-
-            data = pd.read_excel(f"{filepath}", engine = "openpyxl", sheet_name = sheetname)
-
-        else:
-
-            data = pd.read_excel(f"{filepath}", engine = "openpyxl")
+        try:
             
-        click.echo(data.head())
+            if sheetname:
+                data = pd.read_excel(filepath, engine="openpyxl", sheet_name=sheetname)
+
+            else:
+                data = pd.read_excel(filepath, engine="openpyxl")
+            
+            click.echo(data.head())
+
+        except Exception as e:
+            click.echo(f"Error reading '{filepath}': {e}", err=True)
+            

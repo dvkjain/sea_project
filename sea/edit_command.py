@@ -1,7 +1,6 @@
 from pathlib import Path
 import click
 import openpyxl
-import os
 
 class Code:
 
@@ -21,31 +20,35 @@ class Code:
 
         xlsx_file = Path(filepath)
         wb = openpyxl.load_workbook(xlsx_file)
-        filename_with_extension = filepath.split("/")[-1]
-        filename_type = filename_with_extension.split(".")[1]
 
-        if "/" in filepath and "~" in filepath:
+        if sheetname:
+            sheet = wb[sheetname]
 
-            filepath = f"{os.getcwd()}{filename_with_extension}"
-            filepath = filepath.split("/")
+        else:
+            sheet = wb.active
+        
+        sheet[cell] = value
 
-        # if "/" not in filepath:
-
-        #     filepath = filename_with_extension
-
-        filename = filename_with_extension.split(".")[0]
-
-        if sheetname == None:
-
-            spreadsheet = wb.active
+        if not new_filename:
+            new_filename = filepath
         
         else:
 
-            spreadsheet = wb[sheetname]
-            
-        spreadsheet[cell] = value
+            if new_filename == filepath:
 
-        if new_filename == None:
+                click.echo("Warning: the original file will be overwritten with the new changes, proceed?")
+                user = input("Y/N\n")
 
-            new_filename = f"{filename}.{filename_type}"
+                if user.lower().strip() == "y":
+                    pass
+
+                else:
+                    click.echo("Cancelled.")
+                    exit()
+
+        try:
             wb.save(new_filename)
+            click.echo(f"Changes saved to {new_filename}")
+
+        except Exception as e:
+            click.echo(f"Error saving changes: {e}", err=True)
