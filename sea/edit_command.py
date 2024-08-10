@@ -22,33 +22,39 @@ class Code:
         wb = openpyxl.load_workbook(xlsx_file)
 
         if sheetname:
-            sheet = wb[sheetname]
+            if sheetname in wb.sheetnames:
+                sheet = wb[sheetname]
+
+            else:
+                click.echo(f"Error: Sheet '{sheetname}' does not exist.", err=True)
+                exit(1)
 
         else:
             sheet = wb.active
         
-        sheet[cell] = value
-
-        if not new_filename:
-            new_filename = filepath
-        
-        else:
-
-            if new_filename == filepath:
-
-                click.echo("Warning: the original file will be overwritten with the new changes, proceed?")
-                user = input("Y/N\n")
-
-                if user.lower().strip() == "y":
-                    pass
-
-                else:
-                    click.echo("Cancelled.")
-                    exit()
-
         try:
-            wb.save(new_filename)
-            click.echo(f"Changes saved to {new_filename}")
+            sheet[cell] = value
 
         except Exception as e:
-            click.echo(f"Error saving changes: {e}", err=True)
+            click.echo(f"Error updating cell: {e}", err=True)
+            exit(1)
+
+        if new_filename == filepath:
+            if click.confirm("Warning: the original file will be overwritten with the new changes, proceed?"):
+                try:
+                    wb.save(new_filename)
+                    click.echo(f"Changes saved to {new_filename}\n")
+
+                except Exception as e:
+                    click.echo(f"Error saving changes: {e}", err=True)
+
+            else:
+                click.echo("Process canceled, no changes were made.\n")
+                exit()
+        else:
+            try:
+                wb.save(new_filename)
+                click.echo(f"Changes saved to {new_filename}\n")
+
+            except Exception as e:
+                click.echo(f"Error saving changes: {e}", err=True)

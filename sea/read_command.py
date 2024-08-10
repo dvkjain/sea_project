@@ -18,7 +18,6 @@ class Code:
         filepath = Path(filepath).expanduser().resolve()
 
         try:
-            
             if sheetname:
                 data = pd.read_excel(filepath, engine="openpyxl", sheet_name=sheetname)
 
