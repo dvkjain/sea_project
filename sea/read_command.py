@@ -1,6 +1,6 @@
+from pathlib import Path
 import click
 import pandas as pd
-import os
 
 class Code:
 
@@ -15,13 +15,7 @@ class Code:
 
         "Allows the user to read a spreadsheet through a terminal window."
 
-        # Check if filepath contains ~ and replace with expanded home directory
-        if "~" in filepath:
-            filepath = os.path.expanduser(filepath)
-
-        if not os.path.isabs(filepath):
-            # Constructs an absolute file path based on the current working directory
-            filepath = os.path.join(os.getcwd(), filepath)
+        filepath = Path(filepath).expanduser().resolve()
 
         try:
             
