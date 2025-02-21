@@ -2,23 +2,19 @@ from pathlib import Path
 import click
 import openpyxl
 
-class Code:
+@click.command()
+@click.argument("filepath")
+@click.option("-s", "--sheetname", help="Name of the sheet in the spreadsheet. If not given, the active sheet will be considered.")
+@click.argument("cell")
+@click.argument("value")
+@click.option("-n", "--new_filename", help="Name of the new file where changes will be saved. If not provided, changes will be saved to the original file.")
+def edit(filepath, sheetname, cell, value, new_filename):
 
-    def __init__(self):
-        pass
+    """Allows simple editing of a spreadsheet."""
+
+    xlsx_file = Path(filepath)
     
-    @staticmethod
-    @click.command()
-    @click.argument("filepath")
-    @click.option("--sheetname", "-s", help = "Name of the sheet in the spreadsheet. If not given, the active spreadsheet will be considered.")
-    @click.argument("cell")
-    @click.argument("value")
-    @click.option("--new_filename", "-n", help = "Name of the new file where the changes made will be present. If not inserted, changes will appear in the same file.")
-    def edit(filepath, sheetname, cell, value, new_filename):
-
-        "Allows simple editing of a spreadsheet."
-
-        xlsx_file = Path(filepath)
+    try:
         wb = openpyxl.load_workbook(xlsx_file)
 
         if sheetname:
@@ -27,34 +23,28 @@ class Code:
 
             else:
                 click.echo(f"Error: Sheet '{sheetname}' does not exist.", err=True)
-                exit(1)
-
-        else:
-            sheet = wb.active
+                raise SystemExit(1)
         
-        try:
-            sheet[cell] = value
+        else:
+            sheet = wb.active  # Default to the active sheet
+        
+        sheet[cell] = value
 
-        except Exception as e:
-            click.echo(f"Error updating cell: {e}", err=True)
-            exit(1)
+        if new_filename is None:
+            new_filename = filepath  # If no new filename provided, overwrite the original file
 
         if new_filename == filepath:
-            if click.confirm("Warning: the original file will be overwritten with the new changes, proceed?"):
-                try:
-                    wb.save(new_filename)
-                    click.echo(f"Changes saved to {new_filename}\n")
-
-                except Exception as e:
-                    click.echo(f"Error saving changes: {e}", err=True)
-
-            else:
-                click.echo("Process canceled, no changes were made.\n")
-                exit()
-        else:
-            try:
+            if click.confirm("Warning: The original file will be overwritten with the new changes. Do you want to proceed?"):
                 wb.save(new_filename)
                 click.echo(f"Changes saved to {new_filename}\n")
 
-            except Exception as e:
-                click.echo(f"Error saving changes: {e}", err=True)
+            else:
+                click.echo("Process canceled. No changes were made.\n")
+        
+        else:
+            wb.save(new_filename)
+            click.echo(f"Changes saved to {new_filename}\n")
+
+    except Exception as e:
+        click.echo(f"Error processing '{filepath}': {e}", err=True)
+        raise SystemExit(1)
