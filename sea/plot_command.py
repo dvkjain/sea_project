@@ -1,16 +1,12 @@
-from pathlib import Path
 import click
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 @click.command()
 @click.argument("filepath")
 @click.argument("kind")
 @click.option("-x", help="Column name for x-axis. If not provided, the first column is used.")
 @click.option("-y", help="Column name for y-axis. If not provided, the second column is used.")
-@click.option("-sheetname", "-s", help="Name of the sheet in the spreadsheet. If not given, the first sheet will be considered.")
-@click.option("--saveimg","-i", help="if provided, the plot will be saved in a .png file with the name given.")
+@click.option("-sheetname", "--sheet", help="Name of the sheet in the spreadsheet. If not given, the first sheet will be considered.")
+@click.option("--save", "-s", help="If provided, the plot will be saved in a .png file with the name given.")
 def plot(filepath, kind, x, y, sheetname, saveimg):
 
     """Allows the user to plot a spreadsheet through a terminal window.
@@ -19,6 +15,11 @@ def plot(filepath, kind, x, y, sheetname, saveimg):
 
     NOTE: The X and Y axis MUST be COLUMN NAMES in the spreadsheet.
     """
+
+    import pandas as pd
+    from pathlib import Path
+    import matplotlib.pyplot as plt
+    import seaborn as sns
 
     filepath = Path(filepath).expanduser().resolve()
 
@@ -30,24 +31,24 @@ def plot(filepath, kind, x, y, sheetname, saveimg):
 
         if data.shape[1] < 2:
             click.echo("Error: The dataset must have at least two columns.", err=True)
-            return
+            raise SystemExit(1)
 
         # If x or y is missing, it will use the first two columns
         if not x or not y:
             x, y = data.columns[:2]
             click.echo(f"One or both columns were not specified. Using '{x}' for X and '{y}' for Y.")
 
-    except FileNotFoundError:
+    except FileNotFoundError as exc:
         click.echo(f"Error: File '{filepath}' not found.", err=True)
-        return
+        raise SystemExit(1) from exc
     
     except Exception as e:
         click.echo(f"Error processing '{filepath}': {e}", err=True)
-        return
+        raise SystemExit(1) from e
 
     if x not in data.columns or y not in data.columns:
         click.echo(f"Error: Columns '{x}' and/or '{y}' not found in the dataset.", err=True)
-        return
+        raise SystemExit(1)
 
     plt.figure(figsize=(10, 5))
 
@@ -68,7 +69,7 @@ def plot(filepath, kind, x, y, sheetname, saveimg):
 
     else:
         click.echo(f"Error: Unsupported plot kind '{kind}'. Choose from 'line', 'scatter', 'bar', 'box'.", err=True)
-        return
+        raise SystemExit(1)
 
     plt.title(f"{kind.capitalize()} Plot of {y} vs {x}")
     plt.xticks(rotation=45)
@@ -78,3 +79,6 @@ def plot(filepath, kind, x, y, sheetname, saveimg):
         click.echo(f"Plot saved as '{saveimg}'.")
     
     plt.show()
+
+if __name__ == "__main__":
+    plot()
