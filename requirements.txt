@@ -1,6 +1,10 @@
 click >= 7.1.2
 openpyxl >= 3.0.10
+numpy >= 1.21.0
 pandas >= 1.4.3
 pytest-shutil >= 1.7.0
 matplotlib >= 3.4.3
 seaborn >= 0.11.2
+scikit-learn >= 1.0
+joblib >= 1.1.0
+setuptools>=56.0.0
