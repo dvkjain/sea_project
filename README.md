@@ -42,7 +42,7 @@ sea plot .\spreadsheet.xlsx line
 
 sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values
 
-sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values --saveimg plotimg.png
+sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values --save plotimg.png
 ```
 
 ## Neural command
