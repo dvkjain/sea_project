@@ -35,38 +35,35 @@ def scale_data(X_train, y_train, X_test, y_test, scaling, target_scaling):
     scaler = None
     target_scaler = None
 
-    if scaling != "none":
-
-        if scaling == "minmax":
-            scaler = MinMaxScaler()
-
-        elif scaling == "standard":
-            scaler = StandardScaler()
-
-        elif scaling == "log":
-                X_train = np.log1p(X_train)
-                X_test = np.log1p(X_test)
-        
+    # Feature scaling
+    if scaling == "minmax":
+        scaler = MinMaxScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
 
-        target_scaler = None
+    elif scaling == "standard":
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
 
-        if target_scaling != "none":
+    elif scaling == "log":
+        X_train = np.log1p(X_train)
+        X_test = np.log1p(X_test)
 
-            if target_scaling == "minmax":
-                target_scaler = MinMaxScaler()
+    # Target scaling
+    if target_scaling == "minmax":
+        target_scaler = MinMaxScaler()
+        y_train = target_scaler.fit_transform(np.asarray(y_train).reshape(-1, 1)).flatten()
+        y_test = target_scaler.transform(np.asarray(y_test).reshape(-1, 1)).ravel()
 
-            elif target_scaling == "standard":
-                target_scaler = StandardScaler()
-                
-            elif target_scaling == "log":
-                y_train = np.log1p(y_train)
-                y_test = np.log1p(y_test)
-            
-            if target_scaler:
-                y_train = target_scaler.fit_transform(y_train.values.reshape(-1, 1))
-                y_test = target_scaler.transform(y_test.values.reshape(-1, 1))
+    elif target_scaling == "standard":
+        target_scaler = StandardScaler()
+        y_train = target_scaler.fit_transform(np.asarray(y_train).reshape(-1, 1)).flatten()
+        y_test = target_scaler.transform(np.asarray(y_test).reshape(-1, 1)).flatten()
+
+    elif target_scaling == "log":
+        y_train = np.log1p(y_train)
+        y_test = np.log1p(y_test)
 
     return X_train, y_train, X_test, y_test, scaler, target_scaler
 
@@ -93,7 +90,7 @@ def train_and_evaluate_model(model, X_train, y_train, X_test, y_test, target_sca
 
     elif target_scaler is not None:
         y_pred = target_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).flatten()
-        y_test = target_scaler.inverse_transform(y_test.values.reshape(-1, 1)).flatten()
+        y_test = target_scaler.inverse_transform(y_test.reshape(-1, 1)).flatten()
 
     else:
         y_pred = y_pred_scaled
@@ -128,7 +125,7 @@ def save_model(model, filename):
 @click.option("--neurons_per_layer", "--npl", default="1", show_default=True, type=str, help="Comma-separated list of neurons in each layer (e.g. 10,20,10). Default is 1 (one layer with 1 neuron). NOTE: the output layer is automatically added to the model")
 @click.option("--learning_rate", default=0.01, show_default=True, type=float)
 @click.option("--activation", "-a", type=click.Choice(["relu", "tanh", "identity", "logistic"]), default="relu", show_default=True, help="Activation function")
-@click.option("--save", "-s", help="Saves the model (and scalers, if existant) with the selected filename.")
+@click.option("--save", "-s", help="Saves the model (and scalers, if existant) in the selected filename.")
 def neural(path, scaling, target_scaling, random_state, test_size, epochs, batch_size, neurons_per_layer, learning_rate, activation, save):
     
     """Allows the user to train a neural network model on a dataset.\n 
