@@ -35,7 +35,6 @@ def scale_data(X_train, y_train, X_test, y_test, scaling, target_scaling):
     scaler = None
     target_scaler = None
 
-    # Feature scaling
     if scaling == "minmax":
         scaler = MinMaxScaler()
         X_train = scaler.fit_transform(X_train)
@@ -47,21 +46,29 @@ def scale_data(X_train, y_train, X_test, y_test, scaling, target_scaling):
         X_test = scaler.transform(X_test)
 
     elif scaling == "log":
+        if np.any(X_train < 0) or np.any(X_test < 0):
+            raise ValueError("Log scaling requires all feature values to be non-negative.")
+        
         X_train = np.log1p(X_train)
         X_test = np.log1p(X_test)
 
-    # Target scaling
+    y_train = np.asarray(y_train)
+    y_test = np.asarray(y_test)
+
     if target_scaling == "minmax":
         target_scaler = MinMaxScaler()
-        y_train = target_scaler.fit_transform(np.asarray(y_train).reshape(-1, 1)).flatten()
-        y_test = target_scaler.transform(np.asarray(y_test).reshape(-1, 1)).ravel()
+        y_train = target_scaler.fit_transform(y_train.reshape(-1, 1)).flatten()
+        y_test = target_scaler.transform(y_test.reshape(-1, 1)).flatten()
 
     elif target_scaling == "standard":
         target_scaler = StandardScaler()
-        y_train = target_scaler.fit_transform(np.asarray(y_train).reshape(-1, 1)).flatten()
-        y_test = target_scaler.transform(np.asarray(y_test).reshape(-1, 1)).flatten()
+        y_train = target_scaler.fit_transform(y_train.reshape(-1, 1)).flatten()
+        y_test = target_scaler.transform(y_test.reshape(-1, 1)).flatten()
 
     elif target_scaling == "log":
+
+        if np.any(y_train < 0) or np.any(y_test < 0):
+            raise ValueError("Log scaling requires all target values to be non-negative.")
         y_train = np.log1p(y_train)
         y_test = np.log1p(y_test)
 
@@ -99,7 +106,7 @@ def train_and_evaluate_model(model, X_train, y_train, X_test, y_test, target_sca
     r2 = r2_score(y_test, y_pred)
     
     click.echo(f"""
-               -----RESULTS-----
+               ------------RESULTS------------
                Test MAE: {mae}
                Test R²: {r2}
                 """)
@@ -118,7 +125,7 @@ def save_model(model, filename):
 @click.argument("path")
 @click.option("--random_state", default=None, show_default=True, type=int, help="Set a seed for reproducibility. Default is None for random splits")
 @click.option("--test_size", default=0.2, show_default=True, type=float, help="Set a size for the testing data.")
-@click.option("--scaling", type=click.Choice(["none", "minmax", "standard"]), default="none", show_default=True, help="Feature scaling method. When chosen, it will scale ALL x columns")
+@click.option("--scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Feature scaling method. When chosen, it will scale ALL x columns")
 @click.option("--target_scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Target variable scaling method")
 @click.option("--epochs", "-e", default=100, type=int, show_default=True)
 @click.option("--batch_size", default=32, type=int, show_default=True)
@@ -165,11 +172,20 @@ def neural(path, scaling, target_scaling, random_state, test_size, epochs, batch
             if scaler is not None:
                 to_save['X_scaler'] = scaler
                 
-            if target_scaler is not None:
+            if target_scaler is not None and target_scaling != "log":
                 to_save['y_scaler'] = target_scaler
                 
+            if scaling == "log" or target_scaling == "log":
+
+                click.echo("""\n
+                           Log scaler was used, but can't be saved. Only the model, and scalers different than log (if present) will be saved.
+                           \n""")
+                
             joblib.dump(to_save, save)
-            click.echo(f"Model and scalers saved as {save}")
+            if scaling == "log" and target_scaling == "log":
+                click.echo(f"Model saved as {save}. No scalers were saved.")
+            else:
+                click.echo(f"Model and supported scalers saved as {save}.")
 
     except FileNotFoundError as exc:
         click.echo(f"Error: File '{path}' not found.", err=True)

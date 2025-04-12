@@ -53,7 +53,7 @@ The model (and scalers, if used) can also be saved in a joblib file. The target 
 Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling.
 Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
-NOTE: if chosen to save the model, it will be saved in a dictionary containing the model and scalers (if given).
+NOTE: if chosen to save the model, it will be saved in a dictionary containing the model and scalers, if given and supported (log scalers are not supported).
 
 ### Examples
 
