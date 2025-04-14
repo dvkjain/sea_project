@@ -2,7 +2,7 @@ import click
 
 @click.command()
 @click.argument("filepath")
-@click.argument("kind")
+@click.argument("kind", type=click.Choice(["line", "scatter", "bar", "box", "violin"]))
 @click.option("-x", help="Column name for x-axis. If not provided, the first column is used.")
 @click.option("-y", help="Column name for y-axis. If not provided, the second column is used.")
 @click.option("-sheetname", "--sheet", help="Name of the sheet in the spreadsheet. If not given, the first sheet will be considered.")
@@ -52,23 +52,18 @@ def plot(filepath, kind, x, y, sheetname, saveimg):
 
     plt.figure(figsize=(10, 5))
 
-    if kind == "line":
-        sns.lineplot(data=data, x=x, y=y)
+    plot_func = {
+        "line": sns.lineplot,
+        "scatter": sns.scatterplot,
+        "bar": sns.barplot,
+        "box": sns.boxplot,
+        "violin": sns.violinplot,
+    }.get(kind)
 
-    elif kind == "scatter":
-        sns.scatterplot(data=data, x=x, y=y)
-
-    elif kind == "bar":
-        sns.barplot(data=data, x=x, y=y)
-
-    elif kind == "box":
-        sns.boxplot(data=data, x=x, y=y)
-
-    elif kind == "violin":
-        sns.violinplot(data=data, x=x, y=y)
-
+    if plot_func:
+        plot_func(data=data, x=x, y=y)
     else:
-        click.echo(f"Error: Unsupported plot kind '{kind}'. Choose from 'line', 'scatter', 'bar', 'box'.", err=True)
+        click.echo(f"Error: Unsupported plot kind '{kind}'.", err=True)
         raise SystemExit(1)
 
     plt.title(f"{kind.capitalize()} Plot of {y} vs {x}")
