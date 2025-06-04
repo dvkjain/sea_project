@@ -8,7 +8,6 @@ import click
 @click.option("--new_file", "-n", help="Name of the new file where changes will be saved. If not provided, changes will be saved to the original file.")
 def edit(filepath, cell, value, sheetname, new_file):
 
-
     """Allows simple editing of a spreadsheet."""
     
     from pathlib import Path

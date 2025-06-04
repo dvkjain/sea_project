@@ -5,9 +5,9 @@ import click
 @click.argument("kind", type=click.Choice(["line", "scatter", "bar", "box", "violin"]))
 @click.option("-x", help="Column name for x-axis. If not provided, the first column is used.")
 @click.option("-y", help="Column name for y-axis. If not provided, the second column is used.")
-@click.option("-sheetname", "--sheet", help="Name of the sheet in the spreadsheet. If not given, the first sheet will be considered.")
+@click.option("--sheetname", "--sheet", help="Name of the sheet in the spreadsheet. If not given, the first sheet will be considered.")
 @click.option("--save", "-s", help="If provided, the plot will be saved in a .png file with the name given.")
-def plot(filepath, kind, x, y, sheetname, saveimg):
+def plot(filepath, kind, x, y, sheetname, save):
 
     """Allows the user to plot a spreadsheet through a terminal window.
 
@@ -69,9 +69,9 @@ def plot(filepath, kind, x, y, sheetname, saveimg):
     plt.title(f"{kind.capitalize()} Plot of {y} vs {x}")
     plt.xticks(rotation=45)
 
-    if saveimg:
-        plt.savefig(saveimg)
-        click.echo(f"Plot saved as '{saveimg}'.")
+    if save:
+        plt.savefig(save)
+        click.echo(f"Plot saved as '{save}'.")
     
     plt.show()
 

@@ -153,15 +153,13 @@ def neural(path, scaling, target_scaling, random_state, test_size, epochs, batch
         click.echo(f"Batch size: {model.batch_size}")
         click.echo(f"Activation function: {model.activation}")
         click.echo(f"Learning rate used: {model.learning_rate_init}")
+        click.echo(f"Neurons per hidden layer: {model.hidden_layer_sizes}")
 
         if scaling:
             click.echo(f"Scaling method: {scaling}")
             
         if target_scaling != "none":
             click.echo(f"Target scaling method: {target_scaling}")
-
-        click.echo(f"Units per hidden layer: {model.hidden_layer_sizes}")
-
 
         if save:
             import joblib
