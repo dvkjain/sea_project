@@ -1,6 +1,6 @@
 # Sea project
 
-The sea cli-tool is a simple way to read, modify, plot graphs, and do much more with spreadsheets using the terminal.
+The sea CLI-tool is a simple way to read, modify, plot graphs, and do much more with spreadsheets using the terminal.
 
 ## Read command
 
@@ -45,24 +45,46 @@ sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values
 sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values --save plotimg.png
 ```
 
-## Neural command
+## Train command
 
-With the neural command, .xlsx and .csv files can be used to train and evaluate basic neural network models, using sklearn.
-The model (and scalers, if used) can also be saved in a joblib file. The target variable must always be the last column.
+With the train command, .xlsx and .csv files can be used to train and neural network models, using sklearn. The target variable must always be the last column.
 
-Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling.
-Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
+Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling. Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
-NOTE: if chosen to save the model, it will be saved in a dictionary containing the model and scalers, if given and supported (log scalers are not supported).
+NOTE: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, and scalers, if used.
 
 ### Examples
 
 ```console
-sea neural .\spreadsheet.xlsx --random_state 42 --activation logistic
+sea train .\training_data.xlsx --activation logistic -- scaling minmax
 
-sea neural .\spreadsheet.xlsx --random_state 42 --epochs 150 --activation logistic
+sea train .\training_data.xlsx --epochs 150 --activation logistic
 
-sea neural .\spreadsheet.xlsx --random_state 42 --save model.joblib
+sea train .\training_data.xlsx --save model.joblib
+```
+
+## Evaluate command
+
+With the evaluate command, the trained model saved in a .joblib file with the train command can be evaluated using different metrics.
+
+Supported metrics: 
+- mse 
+- mae 
+- mape 
+- r2 
+- medae 
+- evs 
+- max error 
+- msle
+
+### Examples
+
+```console
+sea evaluate .\model.joblib .\test_data.xlsx --metrics mae
+
+sea evaluate .\model.joblib .\test_data.xlsx --metrics r2,mape
+
+sea evaluate .\model.joblib .\test_data.xlsx --metrics "mse, r2"
 ```
 
 ## Installation
