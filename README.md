@@ -33,7 +33,7 @@ sea edit .\spreadsheet.xlsx A2 newvalue --sheetname Sheet1 --new_file newdata.xl
 With the plot command, .xlsx files can be plotted into a graph.
 Supported graph types: line plot, scatter plot, bar plot, box plot, and violin plot.
 
-NOTE: if at least one of the X and Y columns are not given, the first two columns in the spreadsheet will be used instead.
+NOTE: if one of the X and Y columns are not given, the first columns in the spreadsheet will be used instead (first column for X and second column for Y)
 
 ### Examples
 

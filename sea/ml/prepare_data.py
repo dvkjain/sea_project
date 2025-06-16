@@ -12,20 +12,17 @@ def load_data(path):
     elif path.endswith(".json"):
         data = pd.read_json(path).dropna()
 
-    elif path.endswith(".parquet"):
-        data = pd.read_parquet(path).dropna()
-
     elif path.endswith(".h5") or path.endswith(".hdf5"):
         data = pd.read_hdf(path).dropna()
 
     else:
-        raise ValueError("File format not supported. Please use .xlsx, .csv, .json, .parquet, or .h5/.hdf5 files.")
+        raise ValueError("File format not supported. Please use .xlsx, .csv, .json, or .h5/.hdf5 files.", err=True)
 
     if data.empty:
-        raise ValueError("Dataset is empty")
+        raise ValueError("Dataset is empty", err=True)
     
     if data.shape[1] < 2:
-        raise ValueError("Dataset must have at least 2 columns (features + target)")
+        raise ValueError("Dataset must have at least 2 columns (features + target)", err=True)
     
     X = data.drop(columns=[data.columns[-1]])
     y = data[data.columns[-1]]
@@ -49,7 +46,7 @@ def scale_data(X, y, scaling, target_scaling):
 
     elif scaling == "log":
         if np.any(X < 0):
-            raise ValueError("Log scaling requires all feature values to be non-negative.")
+            raise ValueError("Log scaling requires all feature values to be non-negative.", err=True)
         
         X_scaled = np.log1p(X)
 

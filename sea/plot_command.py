@@ -34,9 +34,17 @@ def plot(filepath, kind, x, y, sheetname, save):
             raise SystemExit(1)
 
         # If x or y is missing, it will use the first two columns
-        if not x or not y:
+        if not x and not y:
             x, y = data.columns[:2]
-            click.echo(f"One or both columns were not specified. Using '{x}' for X and '{y}' for Y.")
+            click.echo(f"X and Y columns were not specified. Using '{x}' for X and '{y}' for Y.")
+
+        elif not x:
+            x = data.columns[0]
+            click.echo(f"X column not specified. Using '{x}' for X.")
+
+        elif not y:
+            y = data.columns[1]
+            click.echo(f"Y column not specified. Using '{y}' for Y.")
 
     except FileNotFoundError as exc:
         click.echo(f"Error: File '{filepath}' not found.", err=True)
@@ -46,9 +54,14 @@ def plot(filepath, kind, x, y, sheetname, save):
         click.echo(f"Error processing '{filepath}': {e}", err=True)
         raise SystemExit(1) from e
 
-    if x not in data.columns or y not in data.columns:
-        click.echo(f"Error: Columns '{x}' and/or '{y}' not found in the dataset.", err=True)
-        raise SystemExit(1)
+    if x not in data.columns and y not in data.columns:
+        raise ValueError(f"Error: Columns '{x}' and '{y}' not found in the dataset.", err=True)
+
+    elif x not in data.columns:
+        raise ValueError(f"Error: Column '{x}' not found in the dataset.", err=True)
+    
+    elif y not in data.columns:
+        raise ValueError(f"Error: Column '{y}' not found in the dataset.", err=True)
 
     plt.figure(figsize=(10, 5))
 

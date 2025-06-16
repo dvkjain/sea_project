@@ -7,10 +7,10 @@ def build_model(neurons_per_layer, activation, learning_rate, epochs, batch_size
     from sklearn.neural_network import MLPRegressor
 
     if epochs <= 0:
-        raise ValueError("Epochs must be positive")
+        raise ValueError("Epochs must be positive", err=True)
     
     if batch_size <= 0:
-        raise ValueError("Batch size must be positive")
+        raise ValueError("Batch size must be positive", err=True)
 
     model = MLPRegressor(hidden_layer_sizes=neurons_per_layer, activation=activation,
                          solver='adam', learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
@@ -41,7 +41,7 @@ def train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_sc
 
     return y_train_unscaled, X_train_unscaled
 
-def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, y_train_unscaled, X_train_unscaled):
+def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, y_train_unscaled):
 
     import joblib
 
