@@ -7,10 +7,11 @@ def plot_predictions(y_test, y_pred_unscaled):
 
     plt.figure(figsize=(10, 6))
     sns.scatterplot(x=y_test, y=y_pred_unscaled, alpha=0.5)
-    sns.lineplot(x=y_test, y=y_test, color='red', linestyle='-', label='Perfect Prediction')
+    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linestyle='-', label='Perfect Prediction')
     plt.xlabel("Actual Values")
     plt.ylabel("Predicted Values")
     plt.title("Predictions vs Actual Values")
+    plt.legend()
     plt.show()
 
 def show_metrics(metrics, y_test, y_pred_unscaled):
