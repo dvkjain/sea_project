@@ -31,7 +31,7 @@ def show_metrics(metrics, y_test, y_pred_unscaled):
         "max_error": max_error,
         "msle": mean_squared_log_error,
         }
-
+    valid_metrics = 0
     for metric in metrics.split(","):
         metric = metric.strip().lower()
         if metric in metric_functions:
