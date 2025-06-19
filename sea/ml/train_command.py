@@ -23,19 +23,15 @@ def train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_sc
 
     if target_scaling == "log":
         y_train_unscaled = np.expm1(y_train_scaled)
-
     elif target_scaler is not None:
         y_train_unscaled = target_scaler.inverse_transform(y_train_scaled.reshape(-1, 1)).flatten()
-
     else:
         y_train_unscaled = y_train_scaled
 
     if scaling == "log":
         X_train_unscaled = np.expm1(X_train_scaled)
-
     elif scaler is not None:
         X_train_unscaled = scaler.inverse_transform(X_train_scaled)
-
     else:
         X_train_unscaled = X_train_scaled
 
@@ -46,8 +42,10 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
     import joblib
 
     to_save = {'model': model}
+
     if scaler is not None:
         to_save['X_scaler'] = scaler
+
     if target_scaler is not None and target_scaling != "log":
         to_save['y_scaler'] = target_scaler
 
@@ -57,7 +55,7 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
     to_save['y_train_unscaled'] = y_train_unscaled
 
     joblib.dump(to_save, filename)
-    click.echo(f"Model and supported scalers saved as {filename}.")
+    click.echo(f"Model and supported scalers saved as {filename}.\n")
 
 @click.command()
 @click.argument("path")
@@ -71,6 +69,7 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
 @click.option("--save", "-s", help="Saves the model (and scalers, if existant) in the selected filename.")
 def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, activation, save):
     """Train a neural network model on a dataset."""
+
     try:
         X_train, y_train = load_data(path)
         X_train_scaled, y_train_scaled, scaler, target_scaler = scale_data(X_train, y_train, scaling, target_scaling)
@@ -84,10 +83,11 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
         click.echo(f"Batch size: {model.batch_size}")
         click.echo(f"Activation function: {model.activation}")
         click.echo(f"Learning rate used: {model.learning_rate_init}")
-        click.echo(f"Neurons per hidden layer: {model.hidden_layer_sizes}")
+        click.echo(f"Neurons per hidden layer: {model.hidden_layer_sizes}\n")
 
         if scaling != "none":
             click.echo(f"Scaling method: {scaling}")
+
         if target_scaling != "none":
             click.echo(f"Target scaling method: {target_scaling}")
 
@@ -97,6 +97,7 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
     except FileNotFoundError as exc:
         click.echo(f"Error: File '{path}' not found.", err=True)
         raise SystemExit(1) from exc
+    
     except ValueError as e:
         click.echo(f"Error: {e}", err=True)
         raise SystemExit(1) from e

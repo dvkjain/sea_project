@@ -13,7 +13,7 @@ def plot_predictions(y_test, y_pred_unscaled):
     plt.title("Predictions vs Actual Values")
     plt.show()
 
-def show_metrics(metrics, y_test, y_pred_unscaled, X_test):
+def show_metrics(metrics, y_test, y_pred_unscaled):
     from sklearn.metrics import (
         mean_squared_error, mean_absolute_error, mean_absolute_percentage_error,
         r2_score, median_absolute_error, explained_variance_score, max_error,
@@ -88,7 +88,7 @@ def evaluate(model_path, data_path, metrics, plot):
         raise SystemExit(1) from e
 
     if metrics:
-        show_metrics(metrics, y_test, y_pred_unscaled, X_test)
+        show_metrics(metrics, y_test, y_pred_unscaled)
 
     if plot:
         plot_predictions(y_test, y_pred_unscaled)

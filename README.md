@@ -1,6 +1,6 @@
 # Sea project
 
-The sea CLI-tool is a simple way to read, modify, plot graphs, and do much more with spreadsheets using the terminal.
+The sea CLI-tool is a simple way to read, modify, plot graphs, train and evaluate neural networks using the terminal.
 
 ## Read command
 
@@ -47,7 +47,7 @@ sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values --save plotimg.png
 
 ## Train command
 
-With the train command, .xlsx and .csv files can be used to train and neural network models, using sklearn. The target variable must always be the last column.
+With the train command, .xlsx and .csv files can be used to train and regression neural network models, using sklearn. The target variable must always be the last column.
 
 Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling. Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
@@ -65,7 +65,7 @@ sea train .\training_data.xlsx --save model.joblib
 
 ## Evaluate command
 
-With the evaluate command, the trained model saved in a .joblib file with the train command can be evaluated using different metrics.
+With the evaluate command, the trained regression model saved in a .joblib file with the train command can be evaluated using different metrics.
 
 Supported metrics: 
 - mse 
