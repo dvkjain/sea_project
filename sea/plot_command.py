@@ -30,8 +30,7 @@ def plot(filepath, kind, x, y, sheetname, save):
             data = pd.read_excel(filepath, engine="openpyxl")
 
         if data.shape[1] < 2:
-            click.echo("Error: The dataset must have at least two columns.", err=True)
-            raise SystemExit(1)
+            raise click.ClickException("Error: The dataset must have at least two columns.")
 
         # If x or y is missing, it will use the first two columns
         if not x and not y:
@@ -47,22 +46,17 @@ def plot(filepath, kind, x, y, sheetname, save):
             click.echo(f"Y column not specified. Using '{y}' for Y.")
 
     except FileNotFoundError as exc:
-        click.echo(f"Error: File '{filepath}' not found.", err=True)
-        raise SystemExit(1) from exc
+        raise click.ClickException(f"File not found: {exc}") from exc
     
     except Exception as e:
-        click.echo(f"Error processing '{filepath}': {e}", err=True)
-        raise SystemExit(1) from e
+        raise click.ClickException(f"Error processing file: {e}") from e
 
-    if x not in data.columns and y not in data.columns:
-        raise ValueError(f"Error: Columns '{x}' and '{y}' not found in the dataset.", err=True)
+    if x not in data.columns:
+        raise click.ClickException(f"Error: Column '{x}' not found in the dataset.")
 
-    elif x not in data.columns:
-        raise ValueError(f"Error: Column '{x}' not found in the dataset.", err=True)
+    if y not in data.columns:
+        raise click.ClickException(f"Error: Column '{y}' not found in the dataset.")
     
-    elif y not in data.columns:
-        raise ValueError(f"Error: Column '{y}' not found in the dataset.", err=True)
-
     plt.figure(figsize=(10, 5))
 
     plot_func = {
@@ -75,9 +69,6 @@ def plot(filepath, kind, x, y, sheetname, save):
 
     if plot_func:
         plot_func(data=data, x=x, y=y)
-    else:
-        click.echo(f"Error: Unsupported plot kind '{kind}'.", err=True)
-        raise SystemExit(1)
 
     plt.title(f"{kind.capitalize()} Plot of {y} vs {x}")
     plt.xticks(rotation=45)

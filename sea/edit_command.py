@@ -23,8 +23,8 @@ def edit(filepath, cell, value, sheetname, new_file):
                 sheet = wb[sheetname]
 
             else:
-                click.echo(f"Error: Sheet '{sheetname}' does not exist.", err=True)
-                raise SystemExit(1)
+                raise click.ClickException(f"Sheet '{sheetname}' does not exist.")
+                
             
         else:
             sheet = wb.active  # Default to the active sheet
@@ -47,12 +47,12 @@ def edit(filepath, cell, value, sheetname, new_file):
             click.echo(f"Changes saved to {new_file}\n")
 
     except FileNotFoundError as exc:
-        click.echo(f"Error: File '{filepath}' not found.", err=True)
-        raise SystemExit(1) from exc
+        raise click.ClickException(f"File '{filepath}' not found.")
+
     
     except Exception as e:
-        click.echo(f"Error processing '{filepath}': {e}", err=True)
-        raise SystemExit(1) from e
+        raise click.ClickException(f"Error processing '{filepath}': {e}")
+
 
 if __name__ == "__main__":
     edit()

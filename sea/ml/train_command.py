@@ -7,13 +7,13 @@ def build_model(neurons_per_layer, activation, learning_rate, epochs, batch_size
     from sklearn.neural_network import MLPRegressor
 
     if epochs <= 0:
-        raise ValueError("Epochs must be positive", err=True)
+        raise ValueError("Epochs must be positive")
     
     if batch_size <= 0:
-        raise ValueError("Batch size must be positive", err=True)
-
+        raise ValueError("Batch size must be positive")
+    
     model = MLPRegressor(hidden_layer_sizes=neurons_per_layer, activation=activation,
-                         solver='adam', learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
+                        solver='adam', learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
     
     return model
 
@@ -44,10 +44,10 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
     to_save = {'model': model}
 
     if scaler is not None:
-        to_save['X_scaler'] = scaler
+            to_save['X_scaler'] = scaler
 
     if target_scaler is not None and target_scaling != "log":
-        to_save['y_scaler'] = target_scaler
+            to_save['y_scaler'] = target_scaler
 
     to_save['scaling_type'] = scaling
     to_save['target_scaling_type'] = target_scaling
@@ -55,8 +55,7 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
     to_save['y_train_unscaled'] = y_train_unscaled
 
     joblib.dump(to_save, filename)
-    click.echo(f"Model and supported scalers saved as {filename}.\n")
-
+    
 @click.command()
 @click.argument("path")
 @click.option("--scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Feature scaling method. When chosen, it will scale ALL x columns")
@@ -74,7 +73,11 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
         X_train, y_train = load_data(path)
         X_train_scaled, y_train_scaled, scaler, target_scaler = scale_data(X_train, y_train, scaling, target_scaling)
 
-        neurons_per_layer = list(map(int, neurons_per_layer.split(",")))
+        try:
+            neurons_per_layer = list(map(int, neurons_per_layer.split(",")))
+        except ValueError:
+            raise click.ClickException(f"Error: Invalid format for neurons_per_layer. Expected a comma-separated list of integers, e.g. '10,20,10'.")
+        
         model = build_model(neurons_per_layer, activation, learning_rate, epochs, batch_size)
         y_train_unscaled, X_train_unscaled = train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_scaler, scaling, scaler)
 
@@ -93,11 +96,10 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
 
         if save:
             save_model(model, save, scaler, target_scaler, scaling, target_scaling, y_train_unscaled)
+            click.echo(f"Model and supported scalers saved as {save}.\n")
 
-    except FileNotFoundError as exc:
-        click.echo(f"Error: File '{path}' not found.", err=True)
-        raise SystemExit(1) from exc
+    except FileNotFoundError as e:
+        raise click.ClickException(f"File not found: {e}")
     
     except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise SystemExit(1) from e
+        raise click.ClickException(f"Value error: {e}")

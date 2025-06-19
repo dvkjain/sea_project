@@ -7,7 +7,7 @@ def plot_predictions(y_test, y_pred_unscaled):
 
     plt.figure(figsize=(10, 6))
     sns.scatterplot(x=y_test, y=y_pred_unscaled, alpha=0.5)
-    sns.lineplot(x=y_test, y=y_pred_unscaled, color='red', linestyle='-', label='Perfect Prediction')
+    sns.lineplot(x=y_test, y=y_test, color='red', linestyle='-', label='Perfect Prediction')
     plt.xlabel("Actual Values")
     plt.ylabel("Predicted Values")
     plt.title("Predictions vs Actual Values")
@@ -37,8 +37,12 @@ def show_metrics(metrics, y_test, y_pred_unscaled):
         if metric in metric_functions:
             value = metric_functions[metric](y_test, y_pred_unscaled)
             click.echo(f"{metric.upper()}: {value}")
+            valid_metrics += 1
         else:
             click.echo(f"Warning: Metric '{metric}' is not recognized.")
+    
+    if valid_metrics == 0:
+        raise click.ClickException("No valid metrics provided.")
 
 @click.command()
 @click.argument("model_path")
@@ -81,11 +85,10 @@ def evaluate(model_path, data_path, metrics, plot):
         click.echo(f"Scaling used: {model_data.get('scaling_type', 'none')}\nTarget scaling used: {model_data.get('target_scaling_type', 'none')}")
 
     except FileNotFoundError as exc:
-        click.echo(f"Error: File '{model_path}' or '{data_path}' not found.", err=True)
-        raise SystemExit(1) from exc
+        raise click.ClickException(f"File not found: {exc}") from exc
+    
     except ValueError as e:
-        click.echo(f"Error: {e}", err=True)
-        raise SystemExit(1) from e
+        raise click.ClickException(f"Value error: {e}") from e
 
     if metrics:
         show_metrics(metrics, y_test, y_pred_unscaled)

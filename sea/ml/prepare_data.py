@@ -1,7 +1,12 @@
 import numpy as np
+import os
+
+import pandas as pd
 
 def load_data(path):
-    import pandas as pd
+
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"File not found: {path}")
 
     if path.endswith(".xlsx"):
         data = pd.read_excel(path, engine="openpyxl").dropna()
@@ -16,14 +21,15 @@ def load_data(path):
         data = pd.read_hdf(path).dropna()
 
     else:
-        raise ValueError("File format not supported. Please use .xlsx, .csv, .json, or .h5/.hdf5 files.", err=True)
+        raise ValueError(
+            "File format not supported. Please use .xlsx, .csv, .json, or .h5/.hdf5 files.")
 
     if data.empty:
-        raise ValueError("Dataset is empty", err=True)
-    
-    if data.shape[1] < 2:
-        raise ValueError("Dataset must have at least 2 columns (features + target)", err=True)
-    
+        raise ValueError("Dataset is empty")
+
+    elif data.shape[1] < 2:
+        raise ValueError(f"Dataset must have at least 2 columns (features + target). Found {data.shape[1]}")
+
     X = data.drop(columns=[data.columns[-1]])
     y = data[data.columns[-1]]
 
@@ -46,7 +52,7 @@ def scale_data(X, y, scaling, target_scaling):
 
     elif scaling == "log":
         if np.any(X < 0):
-            raise ValueError("Log scaling requires all feature values to be non-negative.", err=True)
+            raise ValueError("Log scaling requires all feature values to be non-negative.")
         
         X_scaled = np.log1p(X)
 
