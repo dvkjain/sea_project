@@ -1,16 +1,26 @@
 import click
 import numpy as np
+import joblib
 from .prepare_data import load_data, scale_data
 
-def build_model(neurons_per_layer, activation, learning_rate, epochs, batch_size):
-
+def build_model(X_train, neurons_per_layer, activation, learning_rate, epochs, batch_size):
     from sklearn.neural_network import MLPRegressor
 
     if epochs <= 0:
         raise ValueError("Epochs must be positive")
     
-    if batch_size <= 0:
-        raise ValueError("Batch size must be positive")
+    if batch_size != "all":
+        try:
+            if int(batch_size) <= 0:
+                raise ValueError("Batch size must be positive")
+        
+        except ValueError:
+            raise ValueError("Batch size must be a positive integer or 'all'")
+    
+    if batch_size == "all":
+        batch_size = X_train.size
+    else:
+        batch_size = int(batch_size)
     
     model = MLPRegressor(hidden_layer_sizes=neurons_per_layer, activation=activation,
                         solver='adam', learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
@@ -39,8 +49,6 @@ def train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_sc
 
 def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, y_train_unscaled):
 
-    import joblib
-
     to_save = {'model': model}
 
     if scaler is not None:
@@ -61,7 +69,7 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
 @click.option("--scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Feature scaling method. When chosen, it will scale ALL x columns")
 @click.option("--target_scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Target variable scaling method")
 @click.option("--epochs", "-e", default=100, type=int, show_default=True)
-@click.option("--batch_size", default=32, type=int, show_default=True)
+@click.option("--batch_size", default="32", show_default=True, help="Batch size for training. Use 'all' to use the entire dataset as a batch.")
 @click.option("--neurons_per_layer", "--npl", default="1", show_default=True, type=str, help="Comma-separated list of neurons in each layer (e.g. 10,20,10). Default is 1 (one layer with 1 neuron). NOTE: the output layer is automatically added to the model")
 @click.option("--learning_rate", default=0.01, show_default=True, type=float)
 @click.option("--activation", "-a", type=click.Choice(["relu", "tanh", "identity", "logistic"]), default="relu", show_default=True, help="Activation function")
@@ -78,7 +86,7 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
         except ValueError:
             raise click.ClickException(f"Error: Invalid format for neurons_per_layer. Expected a comma-separated list of integers, e.g. '10,20,10'.")
         
-        model = build_model(neurons_per_layer, activation, learning_rate, epochs, batch_size)
+        model = build_model(X_train, neurons_per_layer, activation, learning_rate, epochs, batch_size)
         y_train_unscaled, X_train_unscaled = train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_scaler, scaling, scaler)
 
         click.echo(f"\nModel trained successfully on {path} with {len(X_train)} samples.")

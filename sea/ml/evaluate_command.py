@@ -1,13 +1,15 @@
 import click
+import numpy as np
+import joblib
+import matplotlib.pyplot as plt
 from .prepare_data import load_data
 
 def plot_predictions(y_test, y_pred_unscaled):
-    import matplotlib.pyplot as plt
     import seaborn as sns
 
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=y_test, y=y_pred_unscaled, alpha=0.5)
-    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linestyle='-', label='Perfect Prediction')
+    sns.scatterplot(x=y_test, y=y_pred_unscaled, alpha=0.5,label='Predictions')
+    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linestyle='-', label='Actual Values (Perfect Prediction)')
     plt.xlabel("Actual Values")
     plt.ylabel("Predicted Values")
     plt.title("Predictions vs Actual Values")
@@ -53,9 +55,6 @@ def show_metrics(metrics, y_test, y_pred_unscaled):
 def evaluate(model_path, data_path, metrics, plot):
     """Evaluate a pre-trained model on a new dataset."""
 
-    import joblib
-    import numpy as np
-
     try:
         model_data = joblib.load(model_path)
         model = model_data['model']
@@ -96,5 +95,6 @@ def evaluate(model_path, data_path, metrics, plot):
 
     if plot:
         plot_predictions(y_test, y_pred_unscaled)
+
 if __name__ == "__main__":
     evaluate()

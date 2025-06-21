@@ -60,7 +60,7 @@ sea train .\training_data.xlsx --activation logistic -- scaling minmax
 
 sea train .\training_data.xlsx --epochs 150 --activation logistic
 
-sea train .\training_data.xlsx --save model.joblib
+sea train .\training_data.xlsx --batch_size all --save model.joblib
 ```
 
 ## Evaluate command
