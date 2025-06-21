@@ -1,4 +1,7 @@
 import click
+from pathlib import Path
+import pandas as pd
+import matplotlib.pyplot as plt
 
 @click.command()
 @click.argument("filepath")
@@ -16,9 +19,6 @@ def plot(filepath, kind, x, y, sheetname, save):
     NOTE: The X and Y axis MUST be COLUMN NAMES in the spreadsheet.
     """
 
-    import pandas as pd
-    from pathlib import Path
-    import matplotlib.pyplot as plt
     import seaborn as sns
 
     filepath = Path(filepath).expanduser().resolve()

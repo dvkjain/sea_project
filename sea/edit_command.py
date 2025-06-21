@@ -1,4 +1,6 @@
 import click
+from pathlib import Path
+import openpyxl
 
 @click.command()
 @click.argument("filepath")
@@ -10,9 +12,6 @@ def edit(filepath, cell, value, sheetname, new_file):
 
     """Allows simple editing of a spreadsheet."""
     
-    from pathlib import Path
-    import openpyxl
-
     xlsx_file = Path(filepath)
     
     try:

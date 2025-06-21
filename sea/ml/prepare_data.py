@@ -1,6 +1,5 @@
 import numpy as np
 import os
-
 import pandas as pd
 
 def load_data(path):
@@ -36,7 +35,6 @@ def load_data(path):
     return X, y
 
 def scale_data(X, y, scaling, target_scaling):
-
     from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
     scaler = None

@@ -1,4 +1,6 @@
 import click
+from pathlib import Path
+import pandas as pd
 
 @click.command()
 @click.argument("filepath")
@@ -6,9 +8,6 @@ import click
 def read(filepath, sheetname):
 
     """Allows the user to read a sample of the spreadsheet."""
-
-    from pathlib import Path
-    import pandas as pd
 
     filepath = Path(filepath).expanduser().resolve()
 
