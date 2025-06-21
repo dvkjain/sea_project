@@ -58,7 +58,7 @@ NOTE: if chosen to save, a file will be saved as a dictionary containing the mod
 ```console
 sea train .\training_data.xlsx --activation logistic -- scaling minmax
 
-sea train .\training_data.xlsx --epochs 150 --activation logistic
+sea train .\training_data.xlsx --epochs 150 --optimizer sgd --activation tanh
 
 sea train .\training_data.xlsx --batch_size all --save model.joblib
 ```

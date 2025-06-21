@@ -3,7 +3,7 @@ import numpy as np
 import joblib
 from .prepare_data import load_data, scale_data
 
-def build_model(X_train, neurons_per_layer, activation, learning_rate, epochs, batch_size):
+def build_model(X_train, neurons_per_layer, optimizer, activation, learning_rate, epochs, batch_size):
     from sklearn.neural_network import MLPRegressor
 
     if epochs <= 0:
@@ -21,6 +21,9 @@ def build_model(X_train, neurons_per_layer, activation, learning_rate, epochs, b
         batch_size = X_train.size
     else:
         batch_size = int(batch_size)
+
+    if optimizer not in ["adam", "sgd", "lbfgs"]:
+        raise ValueError(f"Invalid optimizer: {optimizer}. Choose from 'adam', 'sgd', or 'lbfgs'.")
     
     model = MLPRegressor(hidden_layer_sizes=neurons_per_layer, activation=activation,
                         solver='adam', learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
@@ -72,9 +75,10 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
 @click.option("--batch_size", default="32", show_default=True, help="Batch size for training. Use 'all' to use the entire dataset as a batch.")
 @click.option("--neurons_per_layer", "--npl", default="1", show_default=True, type=str, help="Comma-separated list of neurons in each layer (e.g. 10,20,10). Default is 1 (one layer with 1 neuron). NOTE: the output layer is automatically added to the model")
 @click.option("--learning_rate", default=0.01, show_default=True, type=float)
+@click.option("--optimizer", "-o", type=click.Choice(["adam", "sgd", "lbfgs"]), default="adam", show_default=True, help="Optimizer to use for training.")
 @click.option("--activation", "-a", type=click.Choice(["relu", "tanh", "identity", "logistic"]), default="relu", show_default=True, help="Activation function")
 @click.option("--save", "-s", help="Saves the model (and scalers, if existant) in the selected filename.")
-def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, activation, save):
+def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
     """Train a neural network model on a dataset."""
 
     try:
@@ -86,7 +90,7 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
         except ValueError:
             raise click.ClickException(f"Error: Invalid format for neurons_per_layer. Expected a comma-separated list of integers, e.g. '10,20,10'.")
         
-        model = build_model(X_train, neurons_per_layer, activation, learning_rate, epochs, batch_size)
+        model = build_model(X_train, neurons_per_layer, optimizer, activation, learning_rate, epochs, batch_size)
         y_train_unscaled, X_train_unscaled = train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_scaler, scaling, scaler)
 
         click.echo(f"\nModel trained successfully on {path} with {len(X_train)} samples.")
