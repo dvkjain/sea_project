@@ -9,7 +9,7 @@ from .ml.evaluate_command import evaluate
 @click.group()
 def cli():
     
-    """sea is a command line tool that allows basic spreadsheet manipulation, plotting, and neural network training through a terminal window.
+    """sea is a command line tool that allows spreadsheet manipulation, editing, plotting, neural network training and evaluating through a terminal window.
     """
 
 cli.add_command(edit)

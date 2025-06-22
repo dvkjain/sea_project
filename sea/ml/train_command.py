@@ -17,7 +17,7 @@ def build_model(X_train, neurons_per_layer, optimizer, activation, learning_rate
         except ValueError:
             raise ValueError("Batch size must be a positive integer or 'all'")
     
-    if batch_size == "all":
+    if batch_size == "all" or optimizer == "lbfgs":
         batch_size = X_train.size
     else:
         batch_size = int(batch_size)
@@ -26,7 +26,7 @@ def build_model(X_train, neurons_per_layer, optimizer, activation, learning_rate
         raise ValueError(f"Invalid optimizer: {optimizer}. Choose from 'adam', 'sgd', or 'lbfgs'.")
     
     model = MLPRegressor(hidden_layer_sizes=neurons_per_layer, activation=activation,
-                        solver='adam', learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
+                        solver=optimizer, learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
     
     return model
 
@@ -79,7 +79,7 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
 @click.option("--activation", "-a", type=click.Choice(["relu", "tanh", "identity", "logistic"]), default="relu", show_default=True, help="Activation function")
 @click.option("--save", "-s", help="Saves the model (and scalers, if existant) in the selected filename.")
 def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
-    """Train a neural network model on a dataset."""
+    """Train a regression neural network model on a dataset."""
 
     try:
         X_train, y_train = load_data(path)
@@ -95,9 +95,10 @@ def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, 
 
         click.echo(f"\nModel trained successfully on {path} with {len(X_train)} samples.")
         click.echo(f"Epochs: {model.max_iter}")
-        click.echo(f"Batch size: {model.batch_size}")
+        click.echo(f"Batch size: {model.batch_size}") if optimizer != "lbfgs" else click.echo("Since optimizer is 'lbfgs', batch size is automatically set to 'all'.")
+        click.echo(f"Optimizer: {model.solver}")
         click.echo(f"Activation function: {model.activation}")
-        click.echo(f"Learning rate used: {model.learning_rate_init}")
+        click.echo(f"Learning rate: {model.learning_rate_init}")
         click.echo(f"Neurons per hidden layer: {model.hidden_layer_sizes}\n")
 
         if scaling != "none":

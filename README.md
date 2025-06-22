@@ -48,6 +48,7 @@ sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values --save plotimg.png
 ## Train command
 
 With the train command, .xlsx and .csv files can be used to train and regression neural network models, using sklearn. The target variable must always be the last column.
+In sklearn, the MLPRegressor is built only with the MSE (Mean Squared Error) loss function type, together with L2 regularization, without any flexibility to change.
 
 Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling. Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
