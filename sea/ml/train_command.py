@@ -1,74 +1,11 @@
 import click
-import numpy as np
-import joblib
-from .prepare_data import load_data, scale_data
+from .regression_model import RegressionModel
+from .classification_model import ClassificationModel
 
-def build_model(X_train, neurons_per_layer, optimizer, activation, learning_rate, epochs, batch_size):
-    from sklearn.neural_network import MLPRegressor
-
-    if epochs <= 0:
-        raise ValueError("Epochs must be positive")
-    
-    if batch_size != "all":
-        try:
-            if int(batch_size) <= 0:
-                raise ValueError("Batch size must be positive")
-        
-        except ValueError:
-            raise ValueError("Batch size must be a positive integer or 'all'")
-    
-    if batch_size == "all" or optimizer == "lbfgs":
-        batch_size = X_train.size
-    else:
-        batch_size = int(batch_size)
-
-    if optimizer not in ["adam", "sgd", "lbfgs"]:
-        raise ValueError(f"Invalid optimizer: {optimizer}. Choose from 'adam', 'sgd', or 'lbfgs'.")
-    
-    model = MLPRegressor(hidden_layer_sizes=neurons_per_layer, activation=activation,
-                        solver=optimizer, learning_rate_init=learning_rate, max_iter=epochs, batch_size=batch_size)
-    
-    return model
-
-def train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_scaler, scaling, scaler):
-
-    model.fit(X_train_scaled, y_train_scaled)
-
-    if target_scaling == "log":
-        y_train_unscaled = np.expm1(y_train_scaled)
-    elif target_scaler is not None:
-        y_train_unscaled = target_scaler.inverse_transform(y_train_scaled.reshape(-1, 1)).flatten()
-    else:
-        y_train_unscaled = y_train_scaled
-
-    if scaling == "log":
-        X_train_unscaled = np.expm1(X_train_scaled)
-    elif scaler is not None:
-        X_train_unscaled = scaler.inverse_transform(X_train_scaled)
-    else:
-        X_train_unscaled = X_train_scaled
-
-    return y_train_unscaled, X_train_unscaled
-
-def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, y_train_unscaled):
-
-    to_save = {'model': model}
-
-    if scaler is not None:
-            to_save['X_scaler'] = scaler
-
-    if target_scaler is not None and target_scaling != "log":
-            to_save['y_scaler'] = target_scaler
-
-    to_save['scaling_type'] = scaling
-    to_save['target_scaling_type'] = target_scaling
-
-    to_save['y_train_unscaled'] = y_train_unscaled
-
-    joblib.dump(to_save, filename)
-    
 @click.command()
 @click.argument("path")
+@click.option("--task", type=click.Choice(["regression", "classification"]), default="regression", show_default=True, help="Task type: regression or classification.")
+@click.option("--encode", is_flag=True, help="Label encoding for target column. Applicable for classification tasks. If set, the target column will be encoded to integers.")
 @click.option("--scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Feature scaling method. When chosen, it will scale ALL x columns")
 @click.option("--target_scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Target variable scaling method")
 @click.option("--epochs", "-e", default=100, type=int, show_default=True)
@@ -77,42 +14,37 @@ def save_model(model, filename, scaler, target_scaler, scaling, target_scaling, 
 @click.option("--learning_rate", default=0.01, show_default=True, type=float)
 @click.option("--optimizer", "-o", type=click.Choice(["adam", "sgd", "lbfgs"]), default="adam", show_default=True, help="Optimizer to use for training.")
 @click.option("--activation", "-a", type=click.Choice(["relu", "tanh", "identity", "logistic"]), default="relu", show_default=True, help="Activation function")
-@click.option("--save", "-s", help="Saves the model (and scalers, if existant) in the selected filename.")
-def train(path, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
-    """Train a regression neural network model on a dataset."""
-
+@click.option("--save", "-s", help="Saves the model (and scalers/encoder, if existant) in the selected filename.")
+def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
+    """Train a neural network model on a dataset."""
     try:
-        X_train, y_train = load_data(path)
-        X_train_scaled, y_train_scaled, scaler, target_scaler = scale_data(X_train, y_train, scaling, target_scaling)
+        if task == "regression":
+            regr = RegressionModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, target_scaling)
+            X, y = regr.load_data()
+            regr.check_params()
+            regr.scaling_data()
+            regr.build_model()
 
-        try:
-            neurons_per_layer = list(map(int, neurons_per_layer.split(",")))
-        except ValueError:
-            raise click.ClickException(f"Error: Invalid format for neurons_per_layer. Expected a comma-separated list of integers, e.g. '10,20,10'.")
-        
-        model = build_model(X_train, neurons_per_layer, optimizer, activation, learning_rate, epochs, batch_size)
-        y_train_unscaled, X_train_unscaled = train_model(model, X_train_scaled, y_train_scaled, target_scaling, target_scaler, scaling, scaler)
+            regr.train_model()
+            if save:
+                regr.save_model(save)
+            click.echo(str(regr))
 
-        click.echo(f"\nModel trained successfully on {path} with {len(X_train)} samples.")
-        click.echo(f"Epochs: {model.max_iter}")
-        click.echo(f"Batch size: {model.batch_size}") if optimizer != "lbfgs" else click.echo("Since optimizer is 'lbfgs', batch size is automatically set to 'all'.")
-        click.echo(f"Optimizer: {model.solver}")
-        click.echo(f"Activation function: {model.activation}")
-        click.echo(f"Learning rate: {model.learning_rate_init}")
-        click.echo(f"Neurons per hidden layer: {model.hidden_layer_sizes}\n")
+        elif task == "classification":
+            classif = ClassificationModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, encode=encode)
+            classif.load_data()
+            classif.check_params()
+            classif.scaling_data()
+            classif.build_model()
+            classif.encode_target()
 
-        if scaling != "none":
-            click.echo(f"Scaling method: {scaling}")
+            classif.train_model()
+            if save:
+                classif.save_model(save)
 
-        if target_scaling != "none":
-            click.echo(f"Target scaling method: {target_scaling}")
-
-        if save:
-            save_model(model, save, scaler, target_scaler, scaling, target_scaling, y_train_unscaled)
-            click.echo(f"Model and supported scalers saved as {save}.\n")
+            click.echo(str(classif))
 
     except FileNotFoundError as e:
         raise click.ClickException(f"File not found: {e}")
-    
     except ValueError as e:
         raise click.ClickException(f"Value error: {e}")
