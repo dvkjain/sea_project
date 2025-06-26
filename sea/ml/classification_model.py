@@ -1,6 +1,4 @@
 from .base_model import BaseModel
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import LabelEncoder
 import joblib
 
 class ClassificationModel(BaseModel):
@@ -11,6 +9,8 @@ class ClassificationModel(BaseModel):
         self.y_train_encoded = None
 
     def build_model(self):
+        from sklearn.neural_network import MLPClassifier
+
         self.check_params()
         batch_size = self.X.shape[0] if self.batch_size == "all" or self.optimizer == "lbfgs" else int(self.batch_size)
         self.model = MLPClassifier(
@@ -24,6 +24,8 @@ class ClassificationModel(BaseModel):
         return self.model
     
     def encode_target(self):
+        from sklearn.preprocessing import LabelEncoder
+
         if self.encode:
             self.target_encoder = LabelEncoder()
             self.y_train_encoded = self.target_encoder.fit_transform(self.y)

@@ -1,9 +1,7 @@
-import click
-import numpy as np
+import click, os
+import numpy as np, pandas as pd
 import joblib
 import matplotlib.pyplot as plt
-import pandas as pd
-import os
 
 def load_data(path):
 

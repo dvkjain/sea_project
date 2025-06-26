@@ -1,5 +1,5 @@
 from .base_model import BaseModel
-from sklearn.neural_network import MLPRegressor
+import numpy as np
 import joblib
 
 class RegressionModel(BaseModel):
@@ -9,8 +9,8 @@ class RegressionModel(BaseModel):
         self.y_train_unscaled = None
 
     def scaling_data(self):
-        import numpy as np
         from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
         super().scaling_data()
         self.target_scaler = None
         if self.target_scaling == "log":
@@ -26,6 +26,8 @@ class RegressionModel(BaseModel):
             self.y_train_scaled = self.y
             
     def build_model(self):
+        from sklearn.neural_network import MLPRegressor
+
         self.check_params()
         batch_size = self.X.shape[0] if self.batch_size == "all" or self.optimizer == "lbfgs" else int(self.batch_size)
         self.model = MLPRegressor(
@@ -64,5 +66,3 @@ class RegressionModel(BaseModel):
             extra += f"Target scaling method: {self.target_scaling}"
 
         return base+extra
-
-        

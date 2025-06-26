@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 
 class BaseModel:
     def __init__(self, path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling=None):
@@ -56,7 +57,6 @@ class BaseModel:
 
     def scaling_data(self):
         from sklearn.preprocessing import MinMaxScaler, StandardScaler
-        import numpy as np
 
         if self.scaling == "minmax":
             self.scaler = MinMaxScaler()
@@ -74,8 +74,6 @@ class BaseModel:
         else:
             self.X_train_scaled = self.X
 
-        
-
     def __str__(self):
 
         stats = (f"\nModel trained successfully on {self.path} with {len(self.X)} samples.\n"
@@ -90,3 +88,4 @@ class BaseModel:
             stats += f"\nScaling method: {self.scaling}"
 
         return stats
+    
