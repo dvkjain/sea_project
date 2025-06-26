@@ -58,28 +58,19 @@ class BaseModel:
         from sklearn.preprocessing import MinMaxScaler, StandardScaler
         import numpy as np
 
-     # Transorming it into a dataframe so it doesn't give a warning for evaluating classification tasks:
-     # 'UserWarning: X does not have valid feature names, but MLPClassifier was fitted with feature names'
         if self.scaling == "minmax":
             self.scaler = MinMaxScaler()
-            self.X_train_scaled = pd.DataFrame(self.scaler.fit_transform(self.X),
-            columns=self.X.columns,
-            index=self.X.index)
+            self.X_train_scaled = self.scaler.fit_transform(self.X)
             
         elif self.scaling == "standard":
             self.scaler = StandardScaler()
-            self.X_train_scaled = pd.DataFrame(self.scaler.fit_transform(self.X),
-            columns=self.X.columns,
-            index=self.X.index)
+            self.X_train_scaled = self.scaler.fit_transform(self.X)
 
         elif self.scaling == "log":
             if (self.X < 0).any().any():
                 raise ValueError("Log scaling requires all feature values to be non-negative.")
             
-            # Since np.log1p returns a pd.Dataframe if self.X is a dataframe 
-            # (which in this case, it always will be), it is not necessary to write pd.Dataframe. 
-            # Just did if for code clarity
-            self.X_train_scaled = pd.DataFrame(np.log1p(self.X), columns=self.X.columns, index=self.X.index)
+            self.X_train_scaled = np.log1p(self.X)
         else:
             self.X_train_scaled = self.X
 

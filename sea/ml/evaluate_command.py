@@ -152,12 +152,9 @@ def evaluate(model_path, data_path, metrics, plot):
     '''
     if scaling == "log":
 
-        # Since np.log1p returns a pd.Dataframe if self.X is a dataframe 
-        # (which in this case, it always will be), it is not necessary to write pd.Dataframe. 
-        # Just did if for code clarity
-        X_test_scaled = pd.DataFrame(np.log1p(X_test), columns=X_test.columns)
+        X_test_scaled = np.log1p(X_test)
     elif scaler is not None:
-        X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=X_test.columns)
+        X_test_scaled = scaler.transform(X_test)
     else:
         X_test_scaled = X_test
 
