@@ -4,13 +4,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 @click.command()
-@click.argument("filepath")
+@click.argument("path")
 @click.argument("kind", type=click.Choice(["line", "scatter", "bar", "box", "violin"]))
 @click.option("-x", help="Column name for x-axis. If not provided, the first column is used.")
 @click.option("-y", help="Column name for y-axis. If not provided, the second column is used.")
-@click.option("--sheetname", "--sheet", help="Name of the sheet in the spreadsheet. If not given, the first sheet will be considered.")
+@click.option("--sheetname", "--sheet", help="Name of the sheet in the .xlsx or HDF5 file. If not given, the first sheet will be considered.")
 @click.option("--save", "-s", help="If provided, the plot will be saved in a .png file with the name given.")
-def plot(filepath, kind, x, y, sheetname, save):
+def plot(path, kind, x, y, sheetname, save):
 
     """Allows the user to plot a spreadsheet through a terminal window.
 
@@ -21,14 +21,21 @@ def plot(filepath, kind, x, y, sheetname, save):
 
     import seaborn as sns
 
-    filepath = Path(filepath).expanduser().resolve()
+    path = Path(path).expanduser().resolve()
 
     try:
-        if sheetname:
-            data = pd.read_excel(filepath, engine="openpyxl", sheet_name=sheetname) 
+        path = str(path)
+        if path.endswith('.xlsx'):
+            data = pd.read_excel(path, engine="openpyxl", sheet_name=sheetname) if sheetname else pd.read_excel(path, engine="openpyxl")
+        elif path.endswith('.csv'):
+            data = pd.read_csv(path)
+        elif path.endswith('.json'):
+            data = pd.read_json(path)
+        elif path.endswith('.h5') or path.endswith('.hdf5'):
+            data =  pd.read_hdf(path, sheet_name=sheetname) if sheetname else pd.read_hdf(path)
         else:
-            data = pd.read_excel(filepath, engine="openpyxl")
-
+            raise ValueError("Unsupported file format. Please use .xlsx, .csv, .json, or .h5/.hdf5")
+        
         if data.shape[1] < 2:
             raise click.ClickException("Error: The dataset must have at least two columns.")
 
