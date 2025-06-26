@@ -1,31 +1,37 @@
 # Sea project
 
-The sea CLI-tool is a simple way to read, modify, plot graphs, train and evaluate neural networks using the terminal.
+The sea CLI-tool is a simple way to read, clean data, plot graphs, train and evaluate neural networks using the terminal.
+
+Supported file formats:
+- .xlsx
+- .csv
+- .json
+- .h5 or .hdf5
 
 ## Read command
 
-With the read command, .xlsx files can be read (only strings/integers).
+With the read command, supported files can be read (only strings/integers).
 
 ### Examples
 
 ```console
-sea read .\spreadsheet.xlsx
+sea read .\data.csv
 
-sea read .\spreadsheet.xlsx --sheetname Sheet1
+sea read .\data.xlsx --sheetname Sheet1
 ```
 
-## Edit command
+## Clean command
 
-With the edit command, .xlsx files can be edited (only strings/integers).
+With the clean command, supported files can be cleaned (dropna and remove duplicate rows).
 
 ### Examples
 
 ```console
-sea edit .\spreadsheet.xlsx B5 newvalue
+sea clean .\data.csv --dropna
 
-sea edit .\spreadsheet.xlsx A2 newvalue --sheetname Sheet1
+sea clean .\data.xlsx  --sheetname Sheet1 --drop-duplicates
 
-sea edit .\spreadsheet.xlsx A2 newvalue --sheetname Sheet1 --new_file newdata.xlsx
+sea clean .\data.xlsx --dropna --drop-duplicates --save newdata.xlsx
 ```
 
 ## Plot command
@@ -38,37 +44,42 @@ NOTE: if one of the X and Y columns are not given, the first columns in the spre
 ### Examples
 
 ```console
-sea plot .\spreadsheet.xlsx line
+sea plot .\data.csv line
 
-sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values
+sea plot .\data.xlsx bar -x X_values -y Y_values
 
-sea plot .\spreadsheet.xlsx bar -x X_values -y Y_values --save plotimg.png
+sea plot .\data.xlsx bar -x X_values -y Y_values --save plotimg.png
 ```
 
 ## Train command
 
-With the train command, .xlsx and .csv files can be used to train and regression neural network models, using sklearn. The target variable must always be the last column.
+With the train command, supported files can be used to train regression and classification neural network models, using sklearn. The target variable must always be the last column.
+The default model task is "regression". If you want it changed to "classification", just put "--task classification".
 In sklearn, the MLPRegressor is built only with the MSE (Mean Squared Error) loss function type, together with L2 regularization, without any flexibility to change.
+As for MLPClassifier, it is built with Cross-Entropy Loss and L2 regularization, like MLPRegressor. This means the loss function can't be changed here either.
 
-Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling. Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
+- Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling.
+- Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
-NOTE: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, and scalers, if used.
+NOTE 1: if chosen to encode (for classification problems), label encoding will be used for the target variable.
+NOTE 2: target scaling not available for classification tasks. If target scaling given in these scenarios, it will just be ignored by the program.
+NOTE 3: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, scalers, and encoder, if used.
 
 ### Examples
 
 ```console
-sea train .\training_data.xlsx --activation logistic -- scaling minmax
+sea train .\training_data.csv --batch_size all -- scaling minmax
 
 sea train .\training_data.xlsx --epochs 150 --optimizer sgd --activation tanh
 
-sea train .\training_data.xlsx --batch_size all --save model.joblib
+sea train .\training_data.xlsx --task classification --encode --save classif_model.joblib
 ```
 
 ## Evaluate command
 
-With the evaluate command, the trained regression model saved in a .joblib file with the train command can be evaluated using different metrics.
+With the evaluate command, the trained model saved in a .joblib file with the train command can be evaluated using different metrics.
 
-Supported metrics: 
+Supported metrics (regression): 
 - mse 
 - mae 
 - mape 
@@ -78,14 +89,26 @@ Supported metrics:
 - max error 
 - msle
 
+Suported metrics (classification):
+- accuracy score
+- precision score,
+- recall score,
+- f1 score,
+- roc auc score,
+- confusion matrix,
+- classification report
+
+NOTE 1: the program automatically checks if the model is a regression or classification type, so there is no --task option, like in the train command.
+NOTE 2: if encoder was used in the training process of a classification model type, the program will automatically apply label encoding for the target variable in the testing data. The same applies to the scalers used.
+
 ### Examples
 
 ```console
-sea evaluate .\model.joblib .\test_data.xlsx --metrics mae
+sea evaluate .\regr_model.joblib .\test_data.csv --metrics mae
 
-sea evaluate .\model.joblib .\test_data.xlsx --metrics r2,mape
+sea evaluate .\regr_model.joblib .\test_data.xlsx --metrics r2,mape
 
-sea evaluate .\model.joblib .\test_data.xlsx --metrics "mse, r2"
+sea evaluate .\classif_model.joblib .\test_data.xlsx --metrics accuracy,precision
 ```
 
 ## Installation
