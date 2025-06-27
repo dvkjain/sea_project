@@ -20,7 +20,7 @@ def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neuro
     try:
         if task == "regression":
             regr = RegressionModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, target_scaling)
-            X, y = regr.load_data()
+            regr.load_data()
             regr.check_params()
             regr.scaling_data()
             regr.build_model()

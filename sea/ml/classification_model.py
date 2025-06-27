@@ -2,7 +2,7 @@ from .base_model import BaseModel
 import joblib
 
 class ClassificationModel(BaseModel):
-    def __init__(self, path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling=None, encode=False):
+    def __init__(self, path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, encode):
         super().__init__(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling)
         self.encode = encode
         self.target_encoder = None
@@ -29,8 +29,10 @@ class ClassificationModel(BaseModel):
         if self.encode:
             self.target_encoder = LabelEncoder()
             self.y_train_encoded = self.target_encoder.fit_transform(self.y)
+
         else:
             self.y_train_encoded = self.y
+
         return self.y_train_encoded
 
     def train_model(self):
@@ -40,12 +42,15 @@ class ClassificationModel(BaseModel):
     def save_model(self, filename):
         to_save = {'model': self.model}
         to_save['task'] = 'classification'
+        to_save['scaling_type'] = self.scaling
+
         if self.scaler is not None:
             to_save['X_scaler'] = self.scaler
-        to_save['scaling_type'] = self.scaling
+
         if self.target_encoder is not None:
             to_save['target_encoder'] = self.target_encoder
             to_save['y_train_encoded'] = self.y_train_encoded
+
         joblib.dump(to_save, filename)
 
     def __str__(self):

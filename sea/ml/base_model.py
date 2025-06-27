@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 class BaseModel:
-    def __init__(self, path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling=None):
+    def __init__(self, path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling):
         self.path = path
         self.epochs = epochs
         self.batch_size = batch_size
@@ -18,40 +18,51 @@ class BaseModel:
     def load_data(self):
         if not os.path.isfile(self.path):
             raise FileNotFoundError(f"File not found: {self.path}")
+        
         if self.path.endswith(".xlsx"):
             data = pd.read_excel(self.path, engine="openpyxl").dropna()
+        
         elif self.path.endswith(".csv"):
             data = pd.read_csv(self.path).dropna()
+        
         elif self.path.endswith(".json"):
             data = pd.read_json(self.path).dropna()
+        
         elif self.path.endswith(".h5") or self.path.endswith(".hdf5"):
             data = pd.read_hdf(self.path).dropna()
+        
         else:
             raise ValueError("File format not supported. Please use .xlsx, .csv, .json, or .h5/.hdf5 files.")
+        
         if data.empty:
             raise ValueError("Dataset is empty")
+       
         elif data.shape[1] < 2:
             raise ValueError(f"Dataset must have at least 2 columns (features + target). Found {data.shape[1]}")
         self.X = data.drop(columns=[data.columns[-1]])
         self.y = data[data.columns[-1]]
-        return self.X, self.y
 
     def check_params(self):
         if self.epochs <= 0:
             raise ValueError("Epochs must be positive")
+        
         if self.batch_size != "all":
             try:
                 if int(self.batch_size) <= 0:
                     raise ValueError("Batch size must be positive")
+                
             except ValueError:
                 raise ValueError("Batch size must be a positive integer or 'all'")
+        
         if self.optimizer not in ["adam", "sgd", "lbfgs"]:
             raise ValueError(f"Invalid optimizer: {self.optimizer}. Choose from 'adam', 'sgd', or 'lbfgs'.")
+        
         if isinstance(self.neurons_per_layer, str):
             try:
                 self.neurons_per_layer = list(map(int, self.neurons_per_layer.split(",")))
             except ValueError:
                 raise ValueError("Error: Invalid format for neurons_per_layer. Expected a comma-separated list of integers, e.g. '10,20,10'.")
+        
         elif not isinstance(self.neurons_per_layer, list):
             raise ValueError("neurons_per_layer must be a string or a list of integers.")
 

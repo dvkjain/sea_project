@@ -47,6 +47,7 @@ def plot_predictions_classification(y_test_encoded, y_pred_encoded, class_names=
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
                 xticklabels=class_names if class_names is not None else labels,
                 yticklabels=class_names if class_names is not None else labels)
+    
     plt.xlabel("Predicted")
     plt.ylabel("Actual")
     plt.title("Confusion Matrix")
@@ -83,7 +84,9 @@ def show_metrics_regression(metrics, y_test, y_pred_unscaled):
         "max_error": max_error,
         "msle": mean_squared_log_error,
         }
+    
     valid_metrics = 0
+
     for metric in metrics.split(","):
         metric = metric.strip().lower()
         if metric in metric_functions:
@@ -113,13 +116,16 @@ def show_metrics_classification(metrics, y_test_encoded, y_pred_encoded):
         "confusion_matrix": confusion_matrix,
         "classification_report": classification_report
     }
+
     valid_metrics = 0
+
     for metric in metrics.split(","):
         metric = metric.strip().lower()
         if metric in metric_functions:
             value = metric_functions[metric](y_test_encoded, y_pred_encoded)
             click.echo(f"{metric.upper()}: {value}")
             valid_metrics += 1
+            
         else:
             click.echo(f"Warning: Metric '{metric}' is not recognized for classification.")
 
@@ -151,8 +157,10 @@ def evaluate(model_path, data_path, metrics, plot):
     if scaling == "log":
 
         X_test_scaled = np.log1p(X_test)
+
     elif scaler is not None:
         X_test_scaled = scaler.transform(X_test)
+
     else:
         X_test_scaled = X_test
 
@@ -191,6 +199,7 @@ def evaluate(model_path, data_path, metrics, plot):
     if task == "regression":
         if metrics:
             show_metrics_regression(metrics, y_test, y_pred_unscaled)
+            
         if plot:
             plot_predictions_regression(y_test, y_pred_unscaled)
 
