@@ -1,40 +1,8 @@
-import click, os
-import numpy as np, pandas as pd
+import click
+import numpy as np
 import joblib
 import matplotlib.pyplot as plt
-
-def load_data(path):
-
-    if not os.path.isfile(path):
-        raise FileNotFoundError(f"File not found: {path}")
-
-    if path.endswith(".xlsx"):
-        data = pd.read_excel(path, engine="openpyxl").dropna()
-
-    elif path.endswith(".csv"):
-        data = pd.read_csv(path).dropna()
-
-    elif path.endswith(".json"):
-        data = pd.read_json(path).dropna()
-
-    elif path.endswith(".h5") or path.endswith(".hdf5"):
-        data = pd.read_hdf(path).dropna()
-
-    else:
-        raise ValueError(
-            "File format not supported. Please use .xlsx, .csv, .json, or .h5/.hdf5 files.")
-
-    if data.empty:
-        raise ValueError("Dataset is empty")
-
-    elif data.shape[1] < 2:
-        raise ValueError(f"Dataset must have at least 2 columns (features + target). Found {data.shape[1]}")
-
-    X = data.drop(columns=[data.columns[-1]])
-    y = data[data.columns[-1]]
-
-    return X, y
-
+from .data_utils import load_data
 
 def plot_predictions_classification(y_test_encoded, y_pred_encoded, class_names=None):
     import seaborn as sns
@@ -117,19 +85,19 @@ def show_metrics_classification(metrics, y_test_encoded, y_pred_encoded):
         "classification_report": classification_report
     }
 
-    valid_metrics = 0
+    valid_metrics = False
 
     for metric in metrics.split(","):
         metric = metric.strip().lower()
         if metric in metric_functions:
             value = metric_functions[metric](y_test_encoded, y_pred_encoded)
             click.echo(f"{metric.upper()}: {value}")
-            valid_metrics += 1
+            valid_metrics = True
             
         else:
             click.echo(f"Warning: Metric '{metric}' is not recognized for classification.")
 
-    if valid_metrics == 0:
+    if not valid_metrics:
         raise click.ClickException("No valid metrics provided.")
     click.echo()
 
@@ -150,10 +118,6 @@ def evaluate(model_path, data_path, metrics, plot):
     scaler = model_data.get('X_scaler')
     scaling = model_data.get('scaling_type', 'none')
     
-    '''If there is scaling, transforming it into a dataframe
-    so it doesn't give a warning for evaluating classification tasks:
-    'UserWarning: X does not have valid feature names, but MLPClassifier was fitted with feature names'
-    '''
     if scaling == "log":
 
         X_test_scaled = np.log1p(X_test)
@@ -189,6 +153,9 @@ def evaluate(model_path, data_path, metrics, plot):
             y_pred_encoded = model.predict(X_test_scaled)
 
             click.echo(f"Scaling used: {model_data.get('scaling_type', 'none')}\n")
+
+        if not metrics:
+            raise click.ClickException("No metrics provided for evaluation. Use --metrics option to specify metrics.")
 
     except FileNotFoundError as exc:
         raise click.ClickException(f"File not found: {exc}") from exc

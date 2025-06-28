@@ -19,8 +19,10 @@ def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neuro
     """Train a neural network model on a dataset."""
     try:
         if task == "regression":
+            if encode:
+                click.echo("Label encoding is not applicable for regression tasks. It will be ignored.")
+            
             regr = RegressionModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, target_scaling)
-            regr.load_data()
             regr.check_params()
             regr.scaling_data()
             regr.build_model()
@@ -31,8 +33,10 @@ def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neuro
             click.echo(str(regr))
 
         elif task == "classification":
+            if target_scaling != "none":
+                click.echo("Warning: target scaling is not applicable for classification tasks. It will be ignored.")
+            
             classif = ClassificationModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, encode=encode)
-            classif.load_data()
             classif.check_params()
             classif.scaling_data()
             classif.build_model()
