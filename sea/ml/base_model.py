@@ -72,7 +72,7 @@ class BaseModel:
             f"Neurons per hidden layer: {self.neurons_per_layer}\n")
 
         if self.scaling != "none":
-            stats += f"\nScaling method: {self.scaling}"
+            stats += f"\nScaling method: {self.scaling}\n"
 
         return stats
     

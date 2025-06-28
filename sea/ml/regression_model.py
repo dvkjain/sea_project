@@ -62,6 +62,6 @@ class RegressionModel(BaseModel):
         extra = ""
 
         if self.target_scaling != "none":
-            extra += f"Target scaling method: {self.target_scaling}"
+            extra += f"Target scaling method: {self.target_scaling}\n"
 
         return base+extra

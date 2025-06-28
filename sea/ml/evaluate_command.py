@@ -143,7 +143,7 @@ def evaluate(model_path, data_path, metrics, plot):
             else:
                 y_pred_unscaled = y_pred_scaled
 
-            click.echo(f"Scaling used: {model_data.get('scaling_type', 'none')}\nTarget scaling used: {model_data.get('target_scaling_type', 'none')}\n")
+            click.echo(f"\nScaling used: {model_data.get('scaling_type', 'none')}\nTarget scaling used: {model_data.get('target_scaling_type', 'none')}\n")
 
         elif task == "classification":
             target_encoder = model_data.get('target_encoder')
