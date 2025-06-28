@@ -17,6 +17,7 @@ from .classification_model import ClassificationModel
 @click.option("--save", "-s", help="Saves the model (and scalers/encoder, if existant) in the selected filename.")
 def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
     """Train a neural network model on a dataset."""
+    
     try:
         if task == "regression":
             if encode:

@@ -18,11 +18,11 @@ class RegressionModel(BaseModel):
 
         elif self.target_scaling == "minmax":
             self.target_scaler = MinMaxScaler()
-            self.y_train_scaled = self.target_scaler.fit_transform(self.y_train.reshape(-1, 1)).flatten()
+            self.y_train_scaled = self.target_scaler.fit_transform(self.y_train.values.reshape(-1, 1)).flatten()
 
         elif self.target_scaling == "standard":
             self.target_scaler = StandardScaler()
-            self.y_train_scaled = self.target_scaler.fit_transform(self.y_train.reshape(-1, 1)).flatten()
+            self.y_train_scaled = self.target_scaler.fit_transform(self.y_train.values.reshape(-1, 1)).flatten()
 
         else:
             self.y_train_scaled = self.y_train
