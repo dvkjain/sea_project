@@ -62,7 +62,7 @@ As for MLPClassifier, it is built with Cross-Entropy Loss and L2 regularization,
 - Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
 NOTE 1: if chosen to encode (for classification problems), label encoding will be used for the target variable. If chosen to encode in a regression task, a warning will be shown, but the program will ignore it and keep going.  
-NOTE 2: target scaling not available for classification tasks. If target scaling is given in these scenarios, s warning will be shown, but it will be ignored by the program, just like with the encoding situation.  
+NOTE 2: target scaling not available for classification tasks. If target scaling is given in these scenarios, a warning will be shown, but it will be ignored by the program, just like with the encoding situation.  
 NOTE 3: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, scalers, and encoder, if used.
 
 ### Examples
