@@ -3,8 +3,9 @@ from .data_utils import load_data
 import warnings
 
 class BaseModel:
-    def __init__(self, path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling):
+    def __init__(self, path, randon_state, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling):
         self.path = path
+        self.random_state = randon_state
         self.epochs = epochs
         self.batch_size = batch_size
         self.neurons_per_layer = neurons_per_layer
@@ -64,6 +65,7 @@ class BaseModel:
     def __str__(self):
 
         stats = (f"\nModel trained successfully on {self.path} with {len(self.X_train)} samples.\n"
+            f"Random state: {self.random_state}\n"
             f"Epochs: {self.epochs}\n"
             f"Batch size: {self.batch_size if self.batch_size != "all" else f"Batch size: all ({self.X_train.shape[0]})"}\n"
             f"Optimizer: {self.optimizer}\n"

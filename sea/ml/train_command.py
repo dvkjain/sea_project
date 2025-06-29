@@ -4,7 +4,9 @@ from .classification_model import ClassificationModel
 
 @click.command()
 @click.argument("path")
+@click.option("--random_state", type=int, default=42, show_default=True, help="Random state for reproducibility.")
 @click.option("--task", type=click.Choice(["regression", "classification"]), default="regression", show_default=True, help="Task type: regression or classification.")
+@click.option("--auto", "n_trials", type=int, default=None, help="Enable auto-tuning and set the number of trials. e.g., --auto 50")
 @click.option("--encode", is_flag=True, help="Label encoding for target column. Applicable for classification tasks. If set, the target column will be encoded to integers.")
 @click.option("--scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Feature scaling method. When chosen, it will scale ALL x columns")
 @click.option("--target_scaling", type=click.Choice(["none", "minmax", "standard", "log"]), default="none", show_default=True, help="Target variable scaling method")
@@ -15,7 +17,7 @@ from .classification_model import ClassificationModel
 @click.option("--optimizer", "-o", type=click.Choice(["adam", "sgd", "lbfgs"]), default="adam", show_default=True, help="Optimizer to use for training.")
 @click.option("--activation", "-a", type=click.Choice(["relu", "tanh", "identity", "logistic"]), default="relu", show_default=True, help="Activation function")
 @click.option("--save", "-s", help="Saves the model (and scalers/encoder, if existant) in the selected filename.")
-def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
+def train(path, random_state, task, n_trials, encode, scaling, target_scaling, epochs, batch_size, neurons_per_layer, learning_rate, optimizer, activation, save):
     """Train a neural network model on a dataset."""
     
     try:
@@ -23,31 +25,41 @@ def train(path, task, encode, scaling, target_scaling, epochs, batch_size, neuro
             if encode:
                 click.echo("Label encoding is not applicable for regression tasks. It will be ignored.")
             
-            regr = RegressionModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, target_scaling)
+            regr = RegressionModel(path, random_state, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, target_scaling, n_trials)
             regr.check_params()
             regr.scaling_data()
-            regr.build_model()
+            if n_trials is not None:
+                regr.hyperparameter_tuning()
+            else:
+                regr.build_model()
 
             regr.train_model()
+            click.echo(str(regr))
+
             if save:
                 regr.save_model(save)
-            click.echo(str(regr))
+                click.echo(f"Model saved to {save}")
 
         elif task == "classification":
             if target_scaling != "none":
                 click.echo("Warning: target scaling is not applicable for classification tasks. It will be ignored.")
             
-            classif = ClassificationModel(path, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, encode=encode)
+            classif = ClassificationModel(path, random_state, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling, encode, n_trials)
             classif.check_params()
             classif.scaling_data()
-            classif.build_model()
             classif.encode_target()
 
+            if n_trials is not None:
+                classif.hyperparameter_tuning()
+            else:
+                classif.build_model()
             classif.train_model()
-            if save:
-                classif.save_model(save)
 
             click.echo(str(classif))
+
+            if save:
+                classif.save_model(save)
+                click.echo(f"Model saved to {save}")
 
     except FileNotFoundError as e:
         raise click.ClickException(f"File not found: {e}")
