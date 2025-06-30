@@ -55,7 +55,7 @@ class RegressionModel(BaseModel):
             'batch_size': [16, 32, 64, self.X_train.shape[0]],
             'learning_rate_init': uniform(loc=0.0001, scale=0.0099),
             'activation': ['relu', 'tanh'],
-            'hidden_layer_sizes': [(2), (4), (2, 4), (2, 2), (2, 4, 2)]
+            'hidden_layer_sizes': [(2,), (4,), (2, 4), (2, 2), (2, 4, 2)]
         }
 
         regressor = MLPRegressor(max_iter=self.epochs, random_state=self.random_state)
@@ -86,7 +86,7 @@ class RegressionModel(BaseModel):
         self.neurons_per_layer = self.model.hidden_layer_sizes
         self.optimizer = self.model.solver
 
-        if self.model.solver == 'lbfgs':
+        if self.optimizer == 'lbfgs':
             self.batch_size = f"all ({self.X_train.shape[0]})"
         else:
             self.batch_size = self.model.batch_size

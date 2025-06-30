@@ -78,7 +78,7 @@ class ClassificationModel(BaseModel):
         self.neurons_per_layer = self.model.hidden_layer_sizes
         self.optimizer = self.model.solver
 
-        if self.model.solver == 'lbfgs':
+        if self.optimizer == 'lbfgs':
             self.batch_size = f"all ({self.X_train.shape[0]})"
         else:
             self.batch_size = self.model.batch_size

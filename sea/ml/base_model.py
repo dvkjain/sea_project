@@ -34,14 +34,12 @@ class BaseModel:
         if self.optimizer not in ["adam", "sgd", "lbfgs"]:
             raise ValueError(f"Invalid optimizer: {self.optimizer}. Choose from 'adam', 'sgd', or 'lbfgs'.")
         
-        if isinstance(self.neurons_per_layer, str):
-            try:
-                self.neurons_per_layer = list(map(int, self.neurons_per_layer.split(",")))
-            except ValueError:
-                raise ValueError("Error: Invalid format for neurons_per_layer. Expected a comma-separated list of integers, e.g. '10,20,10'.")
-        
-        elif not isinstance(self.neurons_per_layer, list):
-            raise ValueError("neurons_per_layer must be a string or a list of integers.")
+        try:
+            if isinstance(self.neurons_per_layer, str):
+                self.neurons_per_layer = tuple(int(x) for x in self.neurons_per_layer.split(','))
+
+        except ValueError:
+            raise ValueError("Error: Invalid format for neurons_per_layer. Expected comma-separated integers, e.g. '10,20,10'.")
 
     def scaling_data(self):
         from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -71,8 +69,8 @@ class BaseModel:
             f"Optimizer: {self.optimizer}\n"
             f"Activation function: {self.activation}\n"
             f"Learning rate: {self.learning_rate}\n"
-            f"Neurons per hidden layer: {self.neurons_per_layer}\n")
-
+            f"Neurons per hidden layer: {','.join(str(n) for n in self.neurons_per_layer)}\n")
+        
         if self.scaling != "none":
             stats += f"\nScaling method: {self.scaling}\n"
 
