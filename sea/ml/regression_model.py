@@ -55,7 +55,7 @@ class RegressionModel(BaseModel):
             'batch_size': [16, 32, 64, self.X_train.shape[0]],
             'learning_rate_init': uniform(loc=0.0001, scale=0.0099),
             'activation': ['relu', 'tanh'],
-            'hidden_layer_sizes': [(2,), (4,), (2, 4), (2, 2), (2, 4, 2)]
+            'hidden_layer_sizes': [(2,), (4,), (2, 4), (2, 2), (2, 4, 2), (8, 8, 8), (16, 16, 16), (32, 32, 32), (32,64,32), (64, 128, 64)],
         }
 
         regressor = MLPRegressor(max_iter=self.epochs, random_state=self.random_state)
