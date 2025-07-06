@@ -9,3 +9,4 @@ scikit-learn >= 1.0
 joblib >= 1.1.0
 setuptools>=56.0.0
 halo >= 0.0.5
+pyyaml >= 5.4.1
