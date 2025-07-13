@@ -54,7 +54,8 @@ sea plot .\data.xlsx bar -x X_values -y Y_values --save plotimg.png
 ## Train command
 
 With the train command, supported files can be used to train regression and classification neural network models, using sklearn. The target variable must always be the last column.  
-The default model task is "regression". If you want it changed to "classification", just put "--task classification".  
+The train command support .yaml configuration files.  
+The default model task is "regression". If you want it changed to "classification", just put "--task classification", or state in your .yaml file 'task: classification'.  
 In sklearn, the MLPRegressor is built only with the MSE (Mean Squared Error) loss function type, together with L2 regularization, without any flexibility to change.  
 As for MLPClassifier, it is built with Cross-Entropy Loss and L2 regularization, like MLPRegressor. This means the loss function can't be changed here either.
 
@@ -63,21 +64,23 @@ As for MLPClassifier, it is built with Cross-Entropy Loss and L2 regularization,
 
 There is also hyperparameter tuning support! To use it, just use the --auto option, and specify the number of trials (the number of trials you want to run) to let the model search for the best hyperparameters automatically, using RandomizedSearchCV. The cross-validation is set to 5. The hidden layers configuration tuples it compares are: (2,), (4,), (2, 4), (2, 2), (2, 4, 2).
 
-NOTE 1: if chosen to use hyperparemeter tuning, there is a high chance many warnings will be displayed (e.g. convergence warnings). These warnings can be ignored.  
-NOTE 2: if chosen to encode (for classification problems), label encoding will be used for the target variable. If chosen to encode in a regression task, a warning will be shown, but the program will ignore it and keep going.  
-NOTE 3: target scaling not available for classification tasks. If target scaling is given in these scenarios, a warning will be shown, but it will be ignored by the program, just like with the encoding situation.  
-NOTE 4: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, scalers, and encoder, if used.
+NOTE 1: if a certain model specification is both in the .yaml file and stated in the terminal, the value stated in the terminal will ALWAYS override the configuration file.  
+NOTE 2: if chosen to use hyperparemeter tuning, there is a high chance many warnings will be displayed (e.g. convergence warnings). These warnings can be ignored.  
+NOTE 3: hyperparemeter tuning and saving the model can't be done from the .yaml configuration file. If needed, these actions must be stated in the terminal.  
+NOTE 4: if chosen to encode (for classification problems), label encoding will be used for the target variable. If chosen to encode in a regression task, a warning will be shown, but the program will ignore it and keep going.  
+NOTE 5: target scaling not available for classification tasks. If target scaling is given in these scenarios, a warning will be shown, but it will be ignored by the program, just like with the encoding situation.    
+NOTE 6: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, scalers, and encoder, if used.  
 
 ### Examples
 
 ```console
-sea train .\training_data.xlsx
+sea train .\training_data.xlsx --config configuration.yaml --epochs 200 # Overrides epochs in config
 
 sea train .\training_data.xlsx --task classification --auto 20 --scaling log --encode
 
-sea train .\training_data.xlsx --auto 20 --scaling log --target_scaling standard --save model.joblib
+sea train .\training_data.xlsx --auto 20 --scaling log --target_scaling standard --save regr_model.joblib
 
-sea train .\training_data.csv --epochs 150 --optimizer sgd --activation tanh
+sea train .\training_data.csv --config configuration.yaml --save mlmodel.joblib
 
 sea train .\training_data.xlsx --task classification --encode --save classif_model.joblib
 ```
