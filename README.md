@@ -54,7 +54,7 @@ sea plot .\data.xlsx bar -x X_values -y Y_values --save plotimg.png
 ## Train command
 
 With the train command, supported files can be used to train regression and classification neural network models, using sklearn. The target variable must always be the last column.  
-The train command support .yaml configuration files.  
+The train command supports .yaml configuration files.  
 The default model task is "regression". If you want it changed to "classification", just put "--task classification", or state in your .yaml file 'task: classification'.  
 In sklearn, the MLPRegressor is built only with the MSE (Mean Squared Error) loss function type, together with L2 regularization, without any flexibility to change.  
 As for MLPClassifier, it is built with Cross-Entropy Loss and L2 regularization, like MLPRegressor. This means the loss function can't be changed here either.
