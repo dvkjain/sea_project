@@ -70,11 +70,12 @@ NOTE 3: hyperparemeter tuning and saving the model can't be done from the .yaml 
 NOTE 4: if chosen to encode (for classification problems), label encoding will be used for the target variable. If chosen to encode in a regression task, a warning will be shown, but the program will ignore it and keep going.  
 NOTE 5: target scaling not available for classification tasks. If target scaling is given in these scenarios, a warning will be shown, but it will be ignored by the program, just like with the encoding situation (NOTE 5).    
 NOTE 6: if chosen to save, a file will be saved as a dictionary containing the model, its type, training data, scalers, and encoder, if used.  
-NOTE 7: if the user states the --auto option (hyperparemeter tuning), most of the arguments WON'T be used by the program (EVEN IF GIVEN by the user), with the exception of:
-- Scaling (by config file or by stating in the terminal)
-- Target scaling (by config file or by stating in the terminal)
-- Encoding (by config file or by stating in the terminal)
-- Model saving (only by stating it in the terminal)
+NOTE 7: if the user states the --auto option (hyperparemeter tuning), most of the arguments WON'T be used by the program (EVEN IF GIVEN by the user), because the tuner will search for these itself: 
+- Batch size
+- Neurons per layer
+- Learning rate
+- Optimizer
+- Activation funtion
 
 ### Examples
 
