@@ -91,6 +91,24 @@ sea train .\training_data.csv --config configuration.yaml --save mlmodel.joblib
 sea train .\training_data.xlsx --task classification --encode --save classif_model.joblib
 ```
 
+### YAML configuration file example
+
+> ```yaml
+> train:
+>   random_state: 42
+>   task: regression
+>   scaling: none
+>   target_scaling: none
+>   epochs: 100
+>   batch_size: 32
+>   neurons_per_layer: "1"
+>   learning_rate: 0.01
+>   optimizer: adam
+>   activation: relu
+> ```
+
+Note that the neurons_per_layer variable HAS to be a string
+
 ## Evaluate command
 
 With the evaluate command, the trained model saved in a .joblib file with the train command can be evaluated using different metrics.
