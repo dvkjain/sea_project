@@ -32,9 +32,9 @@ def plot(path, kind, x, y, sheetname, save):
         elif path.endswith('.json'):
             data = pd.read_json(path)
         elif path.endswith('.h5') or path.endswith('.hdf5'):
-            data =  pd.read_hdf(path, sheet_name=sheetname) if sheetname else pd.read_hdf(path)
+            data = pd.read_hdf(path, key=sheetname) if sheetname else pd.read_hdf(path)
         else:
-            raise ValueError("Unsupported file format. Please use .xlsx, .csv, .json, or .h5/.hdf5")
+            raise click.ClickException("Unsupported file format. Please use .xlsx, .csv, .json, or .h5/.hdf5")
         
         if data.shape[1] < 2:
             raise click.ClickException("Error: The dataset must have at least two columns.")
