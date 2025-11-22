@@ -62,7 +62,7 @@ As for MLPClassifier, it is built with Cross-Entropy Loss and L2 regularization,
 - Supported scalers: MinMax scaling, Standard scaling, and logarithmic scaling.
 - Supported activation functions: ReLU, tanh, logistic (sigmoid), and identity.
 
-There is also hyperparameter tuning support! To use it, just use the --auto option, and specify the number of trials (the number of trials you want to run) to let the model search for the best hyperparameters automatically, using RandomizedSearchCV. The cross-validation is set to 5. The hidden layers configuration tuples it compares are: (2,), (4,), (2, 4), (2, 2), (2, 4, 2).
+There is also hyperparameter tuning support! To use it, just use the --auto option, and specify the number of trials (the number of trials you want to run) to let the model search for the best hyperparameters automatically, using RandomizedSearchCV. The cross-validation is set to 5. The hidden layers configuration tuples it compares are: (2), (4), (2, 4), (2, 2), (2, 4, 2).
 
 NOTE 1: if a certain model specification is both in the .yaml file and stated in the terminal, the value stated in the terminal will ALWAYS override the configuration file.  
 NOTE 2: if chosen to use hyperparemeter tuning, there is a high chance many warnings will be displayed (e.g. convergence warnings). These warnings can be ignored.  

@@ -97,6 +97,6 @@ def train(path, config, random_state, task, n_trials, encode, scaling, target_sc
                 click.echo(f"Model saved to {save}")
 
     except FileNotFoundError as e:
-        raise click.ClickException(f"File not found: {e}")
+        raise click.ClickException(f"{e}")
     except ValueError as e:
-        raise click.ClickException(f"Value error: {e}")
+        raise click.ClickException(f"{e}")

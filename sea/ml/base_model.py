@@ -3,9 +3,9 @@ from .data_utils import load_data
 import warnings
 
 class BaseModel:
-    def __init__(self, path, randon_state, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling):
+    def __init__(self, path, random_state, epochs, batch_size, neurons_per_layer, optimizer, activation, learning_rate, scaling):
         self.path = path
-        self.random_state = randon_state
+        self.random_state = random_state
         self.epochs = epochs
         self.batch_size = batch_size
         self.neurons_per_layer = neurons_per_layer
@@ -61,17 +61,30 @@ class BaseModel:
             self.X_train_scaled = self.X_train
 
     def __str__(self):
+        n_samples = self.X_train.shape[0]
 
-        stats = (f"\nModel trained successfully on {self.path} with {len(self.X_train)} samples.\n"
+        if isinstance(self.batch_size, str) and self.batch_size.lower().startswith("all"):
+            batch_info = f"all ({n_samples})"
+        else:
+            batch_info = str(self.batch_size)
+
+        if isinstance(self.neurons_per_layer, (list, tuple)):
+            neurons = ",".join(str(n) for n in self.neurons_per_layer)
+        else:
+            neurons = str(self.neurons_per_layer)
+
+        stats = (
+            f"\nModel trained successfully on {self.path} with {n_samples} samples.\n"
             f"Random state: {self.random_state}\n"
             f"Epochs: {self.epochs}\n"
-            f"Batch size: {self.batch_size if self.batch_size != "all" else f"Batch size: all ({self.X_train.shape[0]})"}\n"
+            f"Batch size: {batch_info}\n"
             f"Optimizer: {self.optimizer}\n"
             f"Activation function: {self.activation}\n"
             f"Learning rate: {self.learning_rate}\n"
-            f"Neurons per hidden layer: {','.join(str(n) for n in self.neurons_per_layer)}\n")
-        
-        if self.scaling != "none":
+            f"Neurons per hidden layer: {neurons}\n"
+        )
+
+        if getattr(self, 'scaling', None) and self.scaling != "none":
             stats += f"\nScaling method: {self.scaling}\n"
 
         return stats

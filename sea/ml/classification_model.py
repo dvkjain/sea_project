@@ -47,7 +47,7 @@ class ClassificationModel(BaseModel):
             'batch_size': [16, 32, 64, self.X_train.shape[0]],
             'learning_rate_init': uniform(loc=0.0001, scale=0.0099),
             'activation': ['relu', 'tanh'],
-            'hidden_layer_sizes': [(2), (4), (2, 4), (2, 2), (2, 4, 2)]
+            'hidden_layer_sizes': [(2,), (4,), (2, 4), (2, 2), (2, 4, 2)]
         }
 
         regressor = MLPClassifier(max_iter=self.epochs, random_state=self.random_state)
@@ -63,8 +63,9 @@ class ClassificationModel(BaseModel):
 
         try:
             with spinner:
-                tuner.fit(self.X_train_scaled, self.y_train)
-            
+                y_for_tune = self.y_train_encoded if getattr(self, 'y_train_encoded', None) is not None else self.y_train
+                tuner.fit(self.X_train_scaled, y_for_tune)
+
             spinner.succeed("Search finished.")
 
         except Exception as e:
