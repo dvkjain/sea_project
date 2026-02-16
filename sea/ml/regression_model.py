@@ -11,10 +11,13 @@ class RegressionModel(BaseModel):
     def scaling_data(self):
         from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-        super().scaling_data()
+        super().scaling_data() 
 
         self.target_scaler = None
+        
         if self.target_scaling == "log":
+            if (self.y_train < 0).any():
+                raise ValueError("Target values contain negative numbers, cannot apply log scaling.")
             self.y_train_scaled = np.log1p(self.y_train)
 
         elif self.target_scaling == "minmax":

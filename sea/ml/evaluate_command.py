@@ -120,6 +120,9 @@ def evaluate(model_path, data_path, metrics, plot):
     
     if scaling == "log":
 
+        if (X_test < 0).any().any():
+            raise click.ClickException("Log scaling requires all feature values to be non-negative.")
+
         X_test_scaled = np.log1p(X_test)
 
     elif scaler is not None:
@@ -137,6 +140,8 @@ def evaluate(model_path, data_path, metrics, plot):
             y_pred_scaled = model.predict(X_test_scaled)
 
             if target_scaling == "log":
+                if (y_pred_scaled < 0).any():
+                    raise ValueError("Certain values contain negative numbers, cannot apply inverse log scaling.")
                 y_pred_unscaled = np.expm1(y_pred_scaled)
             elif target_scaler is not None:
                 y_pred_unscaled = target_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).flatten()
