@@ -76,14 +76,14 @@ def show_metrics_classification(metrics, y_test_encoded, y_pred_encoded):
     )
     metrics = metrics.lower()
     metric_functions = {
-        "accuracy": accuracy_score,
-        "precision": precision_score,
-        "recall": recall_score,
-        "f1": f1_score,
-        "roc_auc": roc_auc_score,
-        "confusion_matrix": confusion_matrix,
-        "classification_report": classification_report
-    }
+    "accuracy": accuracy_score,
+    "precision": lambda y_true, y_pred: precision_score(y_true, y_pred, average='weighted', zero_division=0),
+    "recall": lambda y_true, y_pred: recall_score(y_true, y_pred, average='weighted', zero_division=0),
+    "f1": lambda y_true, y_pred: f1_score(y_true, y_pred, average='weighted', zero_division=0),
+    "roc_auc": roc_auc_score,
+    "confusion_matrix": confusion_matrix,
+    "classification_report": classification_report
+}
 
     valid_metrics = False
 
