@@ -148,5 +148,9 @@ sea evaluate .\classif_model.joblib .\test_data.xlsx --metrics accuracy,precisio
 ## Installation
 
 1. Clone the repository
-2. Enter program folder
-3. Run the install.sh file
+2. Enter program folder (through the terminal)
+3. Make sure you have pip installed
+4. Run the following command:
+```console 
+pip install .
+```

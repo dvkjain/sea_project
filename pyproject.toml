@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sea"
+version = "1.0"
+description = "CLI tool for reading, cleaning data, plotting graphs, and training neural networks from the terminal."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "dvkjain"}]
+keywords = ["cli", "data-science", "machine-learning"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "click>=8.0",
+    "numpy>=1.21",
+    "pandas>=1.4",
+    "scipy>=1.7",
+    "matplotlib>=3.4",
+    "seaborn>=0.11",
+    "scikit-learn>=1.0",
+    "joblib>=1.1",
+    "openpyxl>=3.0",
+    "halo>=0.0.5",
+    "pyyaml>=5.4",
+]
+
+[project.scripts]
+sea = "sea.cli:cli"
+
+[tool.setuptools]
+packages = ["sea", "sea.ml"]
+include-package-data = true
