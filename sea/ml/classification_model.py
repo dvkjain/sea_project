@@ -47,7 +47,7 @@ class ClassificationModel(BaseModel):
             'batch_size': [16, 32, 64, self.X_train.shape[0]],
             'learning_rate_init': uniform(loc=0.0001, scale=0.0099),
             'activation': ['relu', 'tanh'],
-            'hidden_layer_sizes': [(2,), (4,), (2, 4), (2, 2), (2, 4, 2)]
+            'hidden_layer_sizes': [(2,2), (4,4), (2, 4), (4,2), (2, 4, 2)]
         }
 
         regressor = MLPClassifier(max_iter=self.epochs, random_state=self.random_state)

@@ -62,8 +62,7 @@ def train(path, config, random_state, task, n_trials, encode, scaling, target_sc
                 regr.hyperparameter_tuning()
             else:
                 regr.build_model()
-
-            regr.train_model()
+                regr.train_model()
             click.echo(str(regr))
 
             if save:
@@ -88,8 +87,7 @@ def train(path, config, random_state, task, n_trials, encode, scaling, target_sc
                 classif.hyperparameter_tuning()
             else:
                 classif.build_model()
-
-            classif.train_model()
+                classif.train_model()
             click.echo(str(classif))
 
             if save:
