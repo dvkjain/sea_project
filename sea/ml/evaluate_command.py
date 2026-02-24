@@ -109,9 +109,12 @@ def show_metrics_classification(metrics, y_test_encoded, y_pred_encoded):
 def evaluate(model_path, data_path, metrics, plot):
     """Evaluate a pre-trained model on a new dataset."""
 
-    model_data = joblib.load(model_path)
-    model = model_data['model']
-    task = model_data.get('task')
+    try:
+        model_data = joblib.load(model_path)
+        model = model_data['model']
+        task = model_data.get('task')
+    except FileNotFoundError:
+        raise click.ClickException(f"Model file not found: {model_path}")
 
     X_test, y_test = load_data(data_path)
 
