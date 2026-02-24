@@ -51,6 +51,17 @@ sea plot .\data.xlsx bar -x X_values -y Y_values
 sea plot .\data.xlsx bar -x X_values -y Y_values --save plotimg.png
 ```
 
+## Split command
+
+With the split command, supported files can be split into two (train and test data), based on a given ratio. The default ratio, in case none is given by the user, is 0.6 (60% train, 40% test).
+
+### Examples
+```
+sea split .\data.csv
+
+sea split .\data.xlsx --ratio 0.5
+```
+
 ## Train command
 
 With the train command, supported files can be used to train regression and classification (binary or multiclass) neural network models, using sklearn. The target variable must always be the last column.  

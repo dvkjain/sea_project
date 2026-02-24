@@ -6,9 +6,10 @@ from pathlib import Path
 @click.argument("path")
 @click.option("--dropna", is_flag=True, help="Remove rows with any N/A values.")
 @click.option("--drop-duplicates", is_flag=True, help="Remove duplicated rows.")
+@click.option("--shuffle", is_flag=True, help="Shuffle the rows of the dataset.")
 @click.option("--sheetname", "--sheet", help="Sheet/key name for Excel/HDF5 files.")
 @click.option("--save", "-s", help="Output file name. If not provided, will overwrite the original file.")
-def clean(path, dropna, drop_duplicates, sheetname, save):
+def clean(path, dropna, drop_duplicates, shuffle, sheetname, save):
     """
     Cleans a data file (xlsx, csv, json, h5) by removing N/A and/or duplicate rows.
     """
@@ -29,11 +30,12 @@ def clean(path, dropna, drop_duplicates, sheetname, save):
     else:
         raise click.ClickException("Unsupported file format. Supported: .xlsx, .csv, .json, .h5, .hdf5")
 
-    # Clean data
     if dropna:
         df = df.dropna()
     if drop_duplicates:
         df = df.drop_duplicates()
+    if shuffle:
+        df = df.sample(frac=1).reset_index(drop=True)
 
     # Save cleaned data
     if ext == ".xlsx":
