@@ -10,7 +10,7 @@ Supported file formats:
 
 ## Read command
 
-With the read command, supported files can be read (only strings/integers).
+The read command loads a supported dataset file and displays a preview of its contents (string and integer columns).
 
 ### Examples
 
@@ -22,7 +22,7 @@ sea read .\data.xlsx --sheetname Sheet1
 
 ## Clean command
 
-With the clean command, supported files can be cleaned (dropna and remove duplicate rows), and also have the datapoints shuffled
+With the clean command, supported files can be cleaned (dropna and remove duplicate rows), and also have their datapoints shuffled.
 
 ### Examples
 
