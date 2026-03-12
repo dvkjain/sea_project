@@ -22,12 +22,14 @@ sea read .\data.xlsx --sheetname Sheet1
 
 ## Clean command
 
-With the clean command, supported files can be cleaned (dropna and remove duplicate rows).
+With the clean command, supported files can be cleaned (dropna and remove duplicate rows), and also have the datapoints shuffled
 
 ### Examples
 
 ```console
 sea clean .\data.csv --dropna
+
+sea clean .\data.xlsx --shuffle
 
 sea clean .\data.xlsx  --sheetname Sheet1 --drop-duplicates
 
