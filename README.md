@@ -38,10 +38,13 @@ sea clean .\data.xlsx --dropna --drop-duplicates --save newdata.xlsx
 
 ## Plot command
 
-With the plot command, .xlsx files can be plotted into a graph.  
-Supported graph types: line plot, scatter plot, bar plot, box plot, and violin plot.
+With the plot command, supported dataset files (.csv, .xlsx, .json, .h5/.hdf5) can be plotted into a graph directly from the terminal.
 
-NOTE: if one of the X and Y columns are not given, the first columns in the spreadsheet will be used instead (first column for X and second column for Y)
+Supported graph types: line, scatter, bar, box, and violin.
+
+NOTE 1: the command natively supports both single-variable and two-variable plots. If you provide only one axis (e.g., just -y), the tool will automatically generate a univariate plot. For example, a single -y on a box plot shows the distribution of that column, while on a line plot, it uses the spreadsheet's row numbers as the X-axis (perfect for timelines).
+
+NOTE 2: if neither X nor Y is specified, the tool will automatically use the first two columns of your spreadsheet (or just the first column if the dataset only has one).
 
 ### Examples
 
